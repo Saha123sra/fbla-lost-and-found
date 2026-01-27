@@ -1,0 +1,21 @@
+{
+  "name": "lost-dane-found",
+  "version": "1.0.0",
+  "description": "Lost and Found System for Denmark High School",
+  "scripts": {
+    "install:all": "cd server && npm install && cd ../client && npm install",
+    "build": "cd client && npm run build",
+    "start": "cd server && npm start",
+    "dev": "cd server && npm run dev",
+    "postinstall": "npm run install:all && npm run build"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-username/lost-dane-found.git"
+  },
+  "keywords": ["lost-and-found", "school", "react", "nodejs"],
+  "license": "MIT"
+}

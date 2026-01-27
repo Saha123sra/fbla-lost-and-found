@@ -1,0 +1,37 @@
+# Dependencies
+node_modules/
+
+# Local uploads
+server/uploads/
+
+# Build outputs
+client/dist/
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Keep example env
+!.env.example
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+
+# Test coverage
+coverage/
+
+# Misc
+*.tmp
+*.temp
