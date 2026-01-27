@@ -8,7 +8,6 @@ const AdminLogin = () => {
   const [email, setEmail] = useState('');
   const [adminId, setAdminId] = useState('');
   const [password, setPassword] = useState('');
-  const [adminCode, setAdminCode] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -32,13 +31,13 @@ const AdminLogin = () => {
       }
       result = await loginOwner({ email, password });
     } else {
-      // Admin login - requires 6-digit code
-      if (!adminId || !password || !adminCode) {
-        setError('All fields are required');
+      // Admin login - Admin ID + password
+      if (!adminId || !password) {
+        setError('Admin ID and password required');
         setLoading(false);
         return;
       }
-      result = await login({ adminId, password, adminCode, role: 'admin' });
+      result = await login({ studentId: adminId, password, role: 'admin' });
     }
 
     setLoading(false);
@@ -146,25 +145,6 @@ const AdminLogin = () => {
                 </button>
               </div>
             </div>
-
-            {loginType === 'admin' && (
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  6-Digit Admin Code
-                </label>
-                <input
-                  type="text"
-                  value={adminCode}
-                  onChange={(e) => setAdminCode(e.target.value)}
-                  placeholder="Enter code from approval email"
-                  maxLength={6}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-navy-500 outline-none transition tracking-widest text-center text-lg"
-                />
-                <p className="text-xs text-gray-500 mt-1">
-                  You'll receive this code when the site owner approves your account
-                </p>
-              </div>
-            )}
 
             <button
               type="submit"

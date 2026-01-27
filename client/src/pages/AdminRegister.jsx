@@ -109,7 +109,7 @@ const AdminRegister = () => {
                   </li>
                   <li className="flex items-start gap-2">
                     <CheckCircle className="w-4 h-4 text-green-500 mt-0.5 shrink-0" />
-                    <span>Once approved, you'll receive an email with your 6-digit admin access code</span>
+                    <span>Once approved, you'll receive an email confirmation</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <CheckCircle className="w-4 h-4 text-green-500 mt-0.5 shrink-0" />
