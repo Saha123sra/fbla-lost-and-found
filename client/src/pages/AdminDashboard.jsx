@@ -181,6 +181,91 @@ const ClaimsManagement = () => {
   );
 };
 
+// Student Directory Component
+const StudentDirectory = () => {
+  const [students, setStudents] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState('');
+
+  useEffect(() => {
+    fetchStudents();
+  }, []);
+
+  const fetchStudents = async () => {
+    try {
+      const response = await adminAPI.getStudents({});
+      setStudents(response.data);
+    } catch (error) {
+      toast.error('Failed to load students');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const filteredStudents = students.filter(student => {
+    const searchLower = search.toLowerCase();
+    return (
+      student.first_name?.toLowerCase().includes(searchLower) ||
+      student.last_name?.toLowerCase().includes(searchLower) ||
+      student.email?.toLowerCase().includes(searchLower) ||
+      student.student_id?.toLowerCase().includes(searchLower)
+    );
+  });
+
+  if (loading) return <div className="text-center py-8">Loading students...</div>;
+
+  return (
+    <div>
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-xl font-bold">Student Directory ({students.length} students)</h2>
+        <input
+          type="text"
+          placeholder="Search students..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-navy-500 outline-none"
+        />
+      </div>
+
+      {filteredStudents.length === 0 ? (
+        <div className="bg-white rounded-xl p-8 text-center text-gray-500">
+          <Users className="w-12 h-12 mx-auto mb-2 text-gray-300" />
+          {search ? 'No students match your search' : 'No students registered yet'}
+        </div>
+      ) : (
+        <div className="bg-white rounded-xl shadow overflow-hidden">
+          <table className="w-full">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="text-left px-6 py-3 text-sm font-medium text-gray-500">Name</th>
+                <th className="text-left px-6 py-3 text-sm font-medium text-gray-500">Student ID</th>
+                <th className="text-left px-6 py-3 text-sm font-medium text-gray-500">Email</th>
+                <th className="text-left px-6 py-3 text-sm font-medium text-gray-500">Grade</th>
+                <th className="text-left px-6 py-3 text-sm font-medium text-gray-500">Claims</th>
+                <th className="text-left px-6 py-3 text-sm font-medium text-gray-500">Items Reported</th>
+                <th className="text-left px-6 py-3 text-sm font-medium text-gray-500">Joined</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-200">
+              {filteredStudents.map((student) => (
+                <tr key={student.id} className="hover:bg-gray-50">
+                  <td className="px-6 py-4 font-medium">{student.first_name} {student.last_name}</td>
+                  <td className="px-6 py-4 text-gray-600">{student.student_id}</td>
+                  <td className="px-6 py-4 text-gray-600">{student.email}</td>
+                  <td className="px-6 py-4 text-gray-600">{student.grade_level || '-'}</td>
+                  <td className="px-6 py-4 text-gray-600">{student.total_claims || 0}</td>
+                  <td className="px-6 py-4 text-gray-600">{student.items_reported || 0}</td>
+                  <td className="px-6 py-4 text-gray-600">{new Date(student.created_at).toLocaleDateString()}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
+  );
+};
+
 // Main Admin Dashboard
 const AdminDashboard = () => {
   const location = useLocation();
@@ -262,12 +347,7 @@ const AdminDashboard = () => {
                 Item management coming soon...
               </div>
             )}
-            {activeTab === 'students' && (
-              <div className="text-gray-500 text-center py-8">
-                <Users className="w-12 h-12 mx-auto mb-2 text-gray-300" />
-                Student directory coming soon...
-              </div>
-            )}
+            {activeTab === 'students' && <StudentDirectory />}
           </div>
         </div>
       </div>
