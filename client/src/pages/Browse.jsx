@@ -4,31 +4,17 @@ import { Search, Filter, Package, X, ChevronLeft, ChevronRight } from 'lucide-re
 import { itemsAPI } from '../services/api';
 import { useLanguage } from '../context/LanguageContext';
 
-// Helper to get full image URL (handles local uploads)
-const getImageUrl = (url) => {
-  if (!url) return null;
-  // If it's a local upload path, prepend the API URL
-  if (url.startsWith('/uploads/')) {
-    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001';
-    // Remove /api suffix if present
-    const baseUrl = apiUrl.replace(/\/api$/, '');
-    return `${baseUrl}${url}`;
-  }
-  return url;
-};
-
 // Image component with error fallback
 const ItemImage = ({ src, alt }) => {
   const [hasError, setHasError] = useState(false);
-  const imageUrl = getImageUrl(src);
 
-  if (!imageUrl || hasError) {
+  if (!src || hasError) {
     return <Package className="w-16 h-16 text-gray-400" />;
   }
 
   return (
     <img
-      src={imageUrl}
+      src={src}
       alt={alt}
       className="w-full h-full object-cover"
       onError={() => setHasError(true)}

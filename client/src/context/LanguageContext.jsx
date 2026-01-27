@@ -5,8 +5,9 @@ import en from '../translations/en';
 import es from '../translations/es';
 import hi from '../translations/hi';
 import fr from '../translations/fr';
+import zh from '../translations/zh';
 
-const translations = { en, es, hi, fr };
+const translations = { en, es, hi, fr, zh };
 
 const LanguageContext = createContext(null);
 
@@ -59,7 +60,8 @@ export const LanguageProvider = ({ children }) => {
     { code: 'en', name: 'English', flag: '🇺🇸', nativeName: 'English' },
     { code: 'es', name: 'Spanish', flag: '🇪🇸', nativeName: 'Español' },
     { code: 'hi', name: 'Hindi', flag: '🇮🇳', nativeName: 'हिंदी' },
-    { code: 'fr', name: 'French', flag: '🇫🇷', nativeName: 'Français' }
+    { code: 'fr', name: 'French', flag: '🇫🇷', nativeName: 'Français' },
+    { code: 'zh', name: 'Mandarin', flag: '🇨🇳', nativeName: '中文' }
   ];
 
   const value = {

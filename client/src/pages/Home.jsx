@@ -94,10 +94,11 @@ const Home = () => {
         <div className="max-w-7xl mx-auto px-4">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
             <div className="p-4">
-              <div className="text-4xl font-bold text-navy-800">{stats.total}</div>
+              <div className="text-4xl text-navy-800">{stats.total}</div>
               <div className="text-gray-600 mt-1">{t('home.stats.itemsFound')}</div>
             </div>
             <div className="p-4">
+
               <div className="text-4xl font-bold text-carolina-500">{stats.claimed}</div>
               <div className="text-gray-600 mt-1">{t('home.stats.itemsReturned')}</div>
             </div>

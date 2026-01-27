@@ -181,6 +181,7 @@ export default {
     en: "English",
     es: "Spanish",
     hi: "Hindi",
-    fr: "French"
+    fr: "French",
+    zh: "Mandarin"
   }
 };

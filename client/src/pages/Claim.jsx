@@ -5,29 +5,17 @@ import { itemsAPI, claimsAPI } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import toast from 'react-hot-toast';
 
-// Helper to get full image URL (handles local uploads)
-const getImageUrl = (url) => {
-  if (!url) return null;
-  if (url.startsWith('/uploads/')) {
-    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001';
-    const baseUrl = apiUrl.replace(/\/api$/, '');
-    return `${baseUrl}${url}`;
-  }
-  return url;
-};
-
 // Image component with error fallback
 const ItemImage = ({ src, alt }) => {
   const [hasError, setHasError] = useState(false);
-  const imageUrl = getImageUrl(src);
 
-  if (!imageUrl || hasError) {
+  if (!src || hasError) {
     return <Package className="w-16 h-16 text-gray-400" />;
   }
 
   return (
     <img
-      src={imageUrl}
+      src={src}
       alt={alt}
       className="w-full h-full object-cover rounded-lg"
       onError={() => setHasError(true)}
