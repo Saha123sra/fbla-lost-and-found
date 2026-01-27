@@ -43,7 +43,14 @@ const AdminLogin = () => {
     setLoading(false);
 
     if (result.success) {
-      navigate(loginType === 'owner' ? '/owner/dashboard' : '/admin');
+      if (result.requiresOTP) {
+        // Admin requires OTP verification
+        navigate('/verify-otp', {
+          state: { userId: result.userId, email: result.email, redirectTo: '/admin' }
+        });
+      } else {
+        navigate(loginType === 'owner' ? '/owner/dashboard' : '/admin');
+      }
     } else {
       setError(result.error || 'Invalid credentials');
     }

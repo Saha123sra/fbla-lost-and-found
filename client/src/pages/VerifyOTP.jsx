@@ -16,7 +16,7 @@ const VerifyOTP = () => {
   const location = useLocation();
   const { completeLogin } = useAuth();
 
-  const { userId, email } = location.state || {};
+  const { userId, email, redirectTo = '/' } = location.state || {};
 
   useEffect(() => {
     // Redirect if no userId
@@ -89,7 +89,7 @@ const VerifyOTP = () => {
       completeLogin(user, token);
 
       toast.success(`Welcome back, ${user.name}!`);
-      navigate('/');
+      navigate(redirectTo);
     } catch (error) {
       const message = error.response?.data?.error || 'Verification failed';
       toast.error(message);

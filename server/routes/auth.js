@@ -142,24 +142,44 @@ router.post('/login', async (req, res) => {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
 
-    // Generate OTP and save to database
-    const otp = generateOTP();
-    const otpExpiry = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+    // MFA only for admin users
+    if (user.role === 'admin') {
+      // Generate OTP and save to database
+      const otp = generateOTP();
+      const otpExpiry = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
 
-    await query(
-      'UPDATE users SET security_code = $1, code_expires_at = $2 WHERE id = $3',
-      [otp, otpExpiry, user.id]
-    );
+      await query(
+        'UPDATE users SET security_code = $1, code_expires_at = $2 WHERE id = $3',
+        [otp, otpExpiry, user.id]
+      );
 
-    // Send OTP email
-    await sendEmail(user.email, 'loginOTP', [user.first_name, otp]);
+      // Send OTP email
+      await sendEmail(user.email, 'loginOTP', [user.first_name, otp]);
 
-    // Return pending MFA status (don't send token yet)
+      // Return pending MFA status (don't send token yet)
+      return res.json({
+        message: 'OTP sent to your email',
+        requiresOTP: true,
+        userId: user.id,
+        email: user.email.replace(/(.{2})(.*)(@.*)/, '$1***$3') // Mask email
+      });
+    }
+
+    // Direct login for students (no MFA)
+    await query('UPDATE users SET last_login = NOW() WHERE id = $1', [user.id]);
+
+    const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, { expiresIn: '7d' });
+
     res.json({
-      message: 'OTP sent to your email',
-      requiresOTP: true,
-      userId: user.id,
-      email: user.email.replace(/(.{2})(.*)(@.*)/, '$1***$3') // Mask email
+      message: 'Login successful',
+      user: {
+        id: user.id,
+        email: user.email,
+        role: user.role,
+        status: user.status,
+        name: `${user.first_name} ${user.last_name}`
+      },
+      token
     });
   } catch (error) {
     console.error('Login error:', error);
