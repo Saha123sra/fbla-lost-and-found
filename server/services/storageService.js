@@ -7,11 +7,12 @@ const supabase = process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_KEY
   ? createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY)
   : null;
 
-// Local uploads directory
-const UPLOADS_DIR = path.join(__dirname, '..', 'uploads');
+// Local uploads directory - use /tmp for Vercel serverless, local path otherwise
+const isVercel = process.env.VERCEL === '1';
+const UPLOADS_DIR = isVercel ? '/tmp/uploads' : path.join(__dirname, '..', 'uploads');
 
-// Ensure uploads directory exists
-if (!fs.existsSync(UPLOADS_DIR)) {
+// Ensure uploads directory exists (skip on Vercel until actually needed)
+if (!isVercel && !fs.existsSync(UPLOADS_DIR)) {
   fs.mkdirSync(UPLOADS_DIR, { recursive: true });
 }
 
@@ -60,6 +61,10 @@ const uploadImage = async (buffer, filename, bucket = 'items') => {
 
   // Fallback to local file storage
   try {
+    // Ensure uploads directory exists (create on demand for Vercel)
+    if (!fs.existsSync(UPLOADS_DIR)) {
+      fs.mkdirSync(UPLOADS_DIR, { recursive: true });
+    }
     const localPath = path.join(UPLOADS_DIR, uniqueName);
     fs.writeFileSync(localPath, buffer);
 
