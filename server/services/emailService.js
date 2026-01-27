@@ -158,6 +158,37 @@ const templates = {
     `
   }),
 
+  loginOTP: (firstName, otpCode) => ({
+    subject: `Your Login Verification Code - ${otpCode}`,
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+        <div style="background: linear-gradient(135deg, #1e3a5f 0%, #2d5a87 100%); padding: 30px; text-align: center;">
+          <h1 style="color: white; margin: 0;">Lost Dane Found</h1>
+          <p style="color: #a8d4ff; margin: 10px 0 0;">Login Verification</p>
+        </div>
+        <div style="padding: 30px; background: #f9fafb;">
+          <h2 style="color: #1e3a5f;">Hi ${firstName}!</h2>
+          <p style="color: #4b5563;">Your login verification code is:</p>
+
+          <div style="background: white; padding: 25px; border-radius: 8px; margin: 25px 0; text-align: center; border: 2px solid #1e3a5f;">
+            <p style="margin: 0; font-size: 42px; font-weight: bold; letter-spacing: 12px; color: #1e3a5f;">${otpCode}</p>
+          </div>
+
+          <div style="background: #fef3c7; padding: 15px; border-radius: 8px; margin: 20px 0;">
+            <p style="margin: 0; color: #92400e; font-size: 14px;">
+              <strong>This code expires in 10 minutes.</strong> If you didn't request this code, please ignore this email.
+            </p>
+          </div>
+
+          <p style="color: #6b7280; font-size: 14px;">For security, never share this code with anyone.</p>
+        </div>
+        <div style="background: #1e3a5f; padding: 20px; text-align: center;">
+          <p style="color: #a8d4ff; margin: 0; font-size: 14px;">Denmark High School Lost & Found</p>
+        </div>
+      </div>
+    `
+  }),
+
   adminApproved: (firstName, securityCode) => ({
     subject: `Your Admin Account Has Been Approved!`,
     html: `

@@ -82,18 +82,27 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  // Login user
+  // Login user - Step 1 (credentials check, OTP sent)
   const login = async (credentials) => {
     try {
       const response = await authAPI.login(credentials);
-      const { user, token } = response.data;
 
+      // Check if OTP is required (MFA enabled)
+      if (response.data.requiresOTP) {
+        return {
+          success: true,
+          requiresOTP: true,
+          userId: response.data.userId,
+          email: response.data.email
+        };
+      }
+
+      // Direct login (if MFA not enabled - fallback)
+      const { user, token } = response.data;
       localStorage.setItem('token', token);
       localStorage.setItem('user', JSON.stringify(user));
-
       setUser(user);
       setIsAuthenticated(true);
-
       toast.success(`Welcome back, ${user.name}!`);
       return { success: true, user };
     } catch (error) {
@@ -126,6 +135,14 @@ export const AuthProvider = ({ children }) => {
       toast.error(message);
       return { success: false, error: message };
     }
+  };
+
+  // Complete login after OTP verification
+  const completeLogin = (user, token) => {
+    localStorage.setItem('token', token);
+    localStorage.setItem('user', JSON.stringify(user));
+    setUser(user);
+    setIsAuthenticated(true);
   };
 
   // Logout user
@@ -165,6 +182,7 @@ export const AuthProvider = ({ children }) => {
     register,
     registerAdmin,
     login,
+    completeLogin,
     loginOwner,
     logout,
     updateProfile

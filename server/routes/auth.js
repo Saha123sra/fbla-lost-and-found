@@ -3,11 +3,17 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { query } = require('../config/database');
 const { authenticate } = require('../middleware/auth');
+const { sendEmail } = require('../services/emailService');
 
 const router = express.Router();
 
 // Generate 6-digit security code
 const generateSecurityCode = () => {
+  return Math.floor(100000 + Math.random() * 900000).toString();
+};
+
+// Generate 6-digit OTP for MFA
+const generateOTP = () => {
   return Math.floor(100000 + Math.random() * 900000).toString();
 };
 
@@ -100,7 +106,7 @@ router.post('/register/admin', async (req, res) => {
   }
 });
 
-// Student Login
+// Student Login - Step 1: Verify credentials and send OTP
 router.post('/login', async (req, res) => {
   try {
     const { studentId, password } = req.body;
@@ -136,8 +142,68 @@ router.post('/login', async (req, res) => {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
 
-    await query('UPDATE users SET last_login = NOW() WHERE id = $1', [user.id]);
+    // Generate OTP and save to database
+    const otp = generateOTP();
+    const otpExpiry = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
 
+    await query(
+      'UPDATE users SET security_code = $1, code_expires_at = $2 WHERE id = $3',
+      [otp, otpExpiry, user.id]
+    );
+
+    // Send OTP email
+    await sendEmail(user.email, 'loginOTP', [user.first_name, otp]);
+
+    // Return pending MFA status (don't send token yet)
+    res.json({
+      message: 'OTP sent to your email',
+      requiresOTP: true,
+      userId: user.id,
+      email: user.email.replace(/(.{2})(.*)(@.*)/, '$1***$3') // Mask email
+    });
+  } catch (error) {
+    console.error('Login error:', error);
+    res.status(500).json({ error: 'Login failed' });
+  }
+});
+
+// Login Step 2: Verify OTP and return token
+router.post('/verify-otp', async (req, res) => {
+  try {
+    const { userId, otp } = req.body;
+
+    if (!userId || !otp) {
+      return res.status(400).json({ error: 'User ID and OTP required' });
+    }
+
+    const result = await query(
+      'SELECT * FROM users WHERE id = $1',
+      [userId]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    const user = result.rows[0];
+
+    // Check OTP
+    if (!user.security_code || user.security_code !== otp) {
+      return res.status(400).json({ error: 'Invalid verification code' });
+    }
+
+    // Check if OTP is expired
+    if (user.code_expires_at && new Date(user.code_expires_at) < new Date()) {
+      return res.status(400).json({ error: 'Verification code has expired. Please login again.' });
+    }
+
+    // Clear OTP after successful verification
+    await query(
+      'UPDATE users SET security_code = NULL, code_expires_at = NULL, last_login = NOW() WHERE id = $1',
+      [user.id]
+    );
+
+    // Generate token
     const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, { expiresIn: '7d' });
 
     res.json({
@@ -152,8 +218,44 @@ router.post('/login', async (req, res) => {
       token
     });
   } catch (error) {
-    console.error('Login error:', error);
-    res.status(500).json({ error: 'Login failed' });
+    console.error('Verify OTP error:', error);
+    res.status(500).json({ error: 'Verification failed' });
+  }
+});
+
+// Resend OTP
+router.post('/resend-otp', async (req, res) => {
+  try {
+    const { userId } = req.body;
+
+    if (!userId) {
+      return res.status(400).json({ error: 'User ID required' });
+    }
+
+    const result = await query('SELECT * FROM users WHERE id = $1', [userId]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    const user = result.rows[0];
+
+    // Generate new OTP
+    const otp = generateOTP();
+    const otpExpiry = new Date(Date.now() + 10 * 60 * 1000);
+
+    await query(
+      'UPDATE users SET security_code = $1, code_expires_at = $2 WHERE id = $3',
+      [otp, otpExpiry, user.id]
+    );
+
+    // Send OTP email
+    await sendEmail(user.email, 'loginOTP', [user.first_name, otp]);
+
+    res.json({ message: 'New verification code sent to your email' });
+  } catch (error) {
+    console.error('Resend OTP error:', error);
+    res.status(500).json({ error: 'Failed to resend code' });
   }
 });
 

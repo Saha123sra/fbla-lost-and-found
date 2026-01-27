@@ -29,7 +29,14 @@ const StudentLogin = () => {
     setLoading(false);
 
     if (result.success) {
-      navigate('/'); // Redirect to homepage or dashboard
+      if (result.requiresOTP) {
+        // Redirect to OTP verification page
+        navigate('/verify-otp', {
+          state: { userId: result.userId, email: result.email }
+        });
+      } else {
+        navigate('/'); // Direct login (fallback)
+      }
     } else {
       setError(result.error || 'Invalid Student ID or password');
     }

@@ -25,6 +25,7 @@ import Request from './pages/Request';
 import MyRequests from './pages/MyRequests';
 import OwnerLogin from './pages/OwnerLogin';
 import OwnerDashboard from './pages/OwnerDashboard';
+import VerifyOTP from './pages/VerifyOTP';
 
 // Protected route wrapper
 const ProtectedRoute = ({ children, adminOnly = false, ownerOnly = false }) => {
@@ -85,6 +86,7 @@ const App = () => {
           <Route path="/register" element={<Navigate to="/register/student" replace />} />
           <Route path="/register/student" element={<StudentRegister />} />
           <Route path="/register/admin" element={<AdminRegister />} />
+          <Route path="/verify-otp" element={<VerifyOTP />} />
 
           {/* Protected routes */}
           <Route
