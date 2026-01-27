@@ -177,13 +177,13 @@ const Browse = () => {
               className={`px-4 py-3 border rounded-lg focus:ring-2 focus:ring-navy-500 outline-none ${!duration ? 'text-gray-400 italic' : 'text-gray-800'}`}
             >
               <option value="" disabled hidden>
-                Duration
+                {t('browse.filter.duration', 'Duration')}
               </option>
-              <option value="">Any Time</option>
-              <option value="1 week">Last Week</option>
-              <option value="2 weeks">Last 2 Weeks</option>
-              <option value="1 month">Last Month</option>
-              <option value=">1 month">Older than 1 Month</option>
+              <option value="">{t('browse.filter.anyTime', 'Any Time')}</option>
+              <option value="1 week">{t('browse.filter.lastWeek', 'Last Week')}</option>
+              <option value="2 weeks">{t('browse.filter.last2Weeks', 'Last 2 Weeks')}</option>
+              <option value="1 month">{t('browse.filter.lastMonth', 'Last Month')}</option>
+              <option value=">1 month">{t('browse.filter.olderThanMonth', 'Older than 1 Month')}</option>
             </select>
 
             {/* Priority */}
@@ -193,11 +193,11 @@ const Browse = () => {
               className={`px-4 py-3 border rounded-lg focus:ring-2 focus:ring-navy-500 outline-none ${!priority ? 'text-gray-400 italic' : 'text-gray-800'}`}
             >
               <option value="" disabled hidden>
-                Priority
+                {t('browse.filter.priority', 'Priority')}
               </option>
-              <option value="">Any Priority</option>
-              <option value="High">High Priority</option>
-              <option value="Low">Low Priority</option>
+              <option value="">{t('browse.filter.anyPriority', 'Any Priority')}</option>
+              <option value="High">{t('browse.filter.highPriority', 'High Priority')}</option>
+              <option value="Low">{t('browse.filter.lowPriority', 'Low Priority')}</option>
             </select>
 
             {/* Availability */}
@@ -207,13 +207,13 @@ const Browse = () => {
               className={`px-4 py-3 border rounded-lg focus:ring-2 focus:ring-navy-500 outline-none ${!status ? 'text-gray-400 italic' : 'text-gray-800'}`}
             >
               <option value="" disabled hidden>
-                Availability
+                {t('browse.filter.availability', 'Availability')}
               </option>
-              <option value="">Available Only</option>
-              <option value="available">Available</option>
-              <option value="pending">Pending Claim</option>
-              <option value="claimed">Claimed</option>
-              <option value="all">All Items</option>
+              <option value="">{t('browse.filter.availableOnly', 'Available Only')}</option>
+              <option value="available">{t('browse.filter.available', 'Available')}</option>
+              <option value="pending">{t('browse.filter.pendingClaim', 'Pending Claim')}</option>
+              <option value="claimed">{t('browse.filter.claimed', 'Claimed')}</option>
+              <option value="all">{t('browse.filter.allItems', 'All Items')}</option>
             </select>
           </div>
 
