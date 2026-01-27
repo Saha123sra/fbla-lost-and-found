@@ -1,8 +1,15 @@
 const { Pool } = require('pg');
 
+// Determine if SSL is needed (use SSL for remote databases like Supabase)
+const isRemoteDB = process.env.DATABASE_URL &&
+  (process.env.DATABASE_URL.includes('supabase') ||
+   process.env.DATABASE_URL.includes('pooler') ||
+   process.env.NODE_ENV === 'production' ||
+   process.env.VERCEL);
+
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
+  ssl: isRemoteDB ? { rejectUnauthorized: false } : false
 });
 
 pool.on('connect', () => {

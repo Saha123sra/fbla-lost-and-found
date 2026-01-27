@@ -4,8 +4,11 @@ const cors = require('cors');
 const helmet = require('helmet');
 const path = require('path');
 
-// Load environment variables
-require('dotenv').config({ path: path.join(__dirname, '../server/.env') });
+// Load environment variables (Vercel sets these from the dashboard)
+// Only use dotenv locally - Vercel provides env vars automatically
+if (process.env.NODE_ENV !== 'production') {
+  require('dotenv').config({ path: path.join(__dirname, '../server/.env') });
+}
 
 // Import routes
 const authRoutes = require('../server/routes/auth');
