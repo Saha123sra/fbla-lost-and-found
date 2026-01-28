@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, Crown, Shield } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+// Force rebuild: v2.0 - OTP-based admin authentication
 
 const AdminLogin = () => {
   const [loginType, setLoginType] = useState('owner'); // 'owner' or 'admin'
