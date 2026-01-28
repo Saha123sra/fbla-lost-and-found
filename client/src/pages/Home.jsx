@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { Search, Upload, CheckCircle, ArrowRight, Package } from 'lucide-react';
 import { itemsAPI, testimonialsAPI } from '../services/api';
 import { useLanguage } from '../context/LanguageContext';
-import heroVideo from '../assets/Black White Vintage Film Look Wedding Slideshow Video (1).mp4';
+import heroVideo from '../assets/Lost Dane Found Home page video.mp4';
 
 const Home = () => {
   const { t } = useLanguage();

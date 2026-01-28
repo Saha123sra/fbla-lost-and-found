@@ -40,7 +40,7 @@ const Footer = () => {
               </li>
               <li>
                 <a
-                  href="https://www.forsyth.k12.ga.us/denmark"
+                  href="https://dhs.forsyth.k12.ga.us/"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-gray-400 hover:text-skyblue-300 transition"
@@ -72,12 +72,17 @@ const Footer = () => {
         </div>
 
         {/* Bottom Bar */}
-        <div className="border-t border-navy-700 mt-8 pt-8 flex flex-col md:flex-row justify-between items-center">
-          <p className="text-gray-400 text-sm">
-            © 2025 {t('footer.copyright')}
-          </p>
-          <p className="text-gray-500 text-sm mt-2 md:mt-0">
-            Go Danes! 🐕
+        <div className="border-t border-navy-700 mt-8 pt-8">
+          <div className="flex flex-col md:flex-row justify-between items-center mb-4">
+            <p className="text-gray-400 text-sm">
+              © 2025 {t('footer.copyright')}
+            </p>
+            <p className="text-gray-500 text-sm mt-2 md:mt-0">
+              Go Danes! 🐕
+            </p>
+          </div>
+          <p className="text-gray-300 text-xs text-center">
+            Developed by Denmark High School students with school permission to support our community.
           </p>
         </div>
       </div>
