@@ -44,7 +44,10 @@ export const authAPI = {
   verifyCode: (code) => api.post('/auth/verify-code', { code }),
   getMe: () => api.get('/auth/me'),
   updateProfile: (data) => api.patch('/auth/me', data),
-  changePassword: (data) => api.post('/auth/change-password', data)
+  changePassword: (data) => api.post('/auth/change-password', data),
+  forgotPassword: (email) => api.post('/auth/forgot-password', { email }),
+  verifyResetToken: (token) => api.get(`/auth/verify-reset-token/${token}`),
+  resetPassword: (token, password) => api.post('/auth/reset-password', { token, password })
 };
 
 // ============ ITEMS ============
@@ -116,7 +119,8 @@ export const ownerAPI = {
   getAdmins: (status) => api.get('/owner/admins', { params: { status } }),
   approveAdmin: (id) => api.post(`/owner/approve-admin/${id}`),
   denyAdmin: (id, reason) => api.post(`/owner/deny-admin/${id}`, { reason }),
-  deactivateAdmin: (id, reason) => api.post(`/owner/deactivate-admin/${id}`, { reason })
+  deactivateAdmin: (id, reason) => api.post(`/owner/deactivate-admin/${id}`, { reason }),
+  reactivateAdmin: (id) => api.post(`/owner/reactivate-admin/${id}`)
 };
 
 // ============ FAQ ============

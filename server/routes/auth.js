@@ -154,15 +154,24 @@ router.post('/login', async (req, res) => {
       );
 
       // Send OTP email
-      await sendEmail(user.email, 'loginOTP', [user.first_name, otp]);
+      const emailResult = await sendEmail(user.email, 'loginOTP', [user.first_name, otp]);
 
-      // Return pending MFA status (don't send token yet)
-      return res.json({
+      // Build response
+      const response = {
         message: 'OTP sent to your email',
         requiresOTP: true,
         userId: user.id,
         email: user.email.replace(/(.{2})(.*)(@.*)/, '$1***$3') // Mask email
-      });
+      };
+
+      // If in dev mode (no Resend API key), include OTP in response for testing
+      if (emailResult.dev) {
+        response.devMode = true;
+        response.devOTP = otp;
+        response.devMessage = 'Email service not configured. Use the code shown below to login.';
+      }
+
+      return res.json(response);
     }
 
     // Direct login for students (no MFA)
@@ -270,9 +279,18 @@ router.post('/resend-otp', async (req, res) => {
     );
 
     // Send OTP email
-    await sendEmail(user.email, 'loginOTP', [user.first_name, otp]);
+    const emailResult = await sendEmail(user.email, 'loginOTP', [user.first_name, otp]);
 
-    res.json({ message: 'New verification code sent to your email' });
+    const response = { message: 'New verification code sent to your email' };
+
+    // If in dev mode, include OTP in response for testing
+    if (emailResult.dev) {
+      response.devMode = true;
+      response.devOTP = otp;
+      response.devMessage = 'Email service not configured. Use the code shown below.';
+    }
+
+    res.json(response);
   } catch (error) {
     console.error('Resend OTP error:', error);
     res.status(500).json({ error: 'Failed to resend code' });
@@ -372,6 +390,165 @@ router.get('/me', authenticate, async (req, res) => {
     gradeLevel: req.user.grade_level,
     name: `${req.user.first_name} ${req.user.last_name}`
   });
+});
+
+// Generate secure reset token
+const generateResetToken = () => {
+  const crypto = require('crypto');
+  return crypto.randomBytes(32).toString('hex');
+};
+
+// Request Password Reset (Forgot Password)
+router.post('/forgot-password', async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      return res.status(400).json({ error: 'Email is required' });
+    }
+
+    // Find user by email
+    const result = await query(
+      'SELECT id, email, first_name, role, status FROM users WHERE email = $1',
+      [email.toLowerCase()]
+    );
+
+    // Always return success to prevent email enumeration
+    if (result.rows.length === 0) {
+      return res.json({
+        success: true,
+        message: 'If an account with that email exists, a password reset link has been sent.'
+      });
+    }
+
+    const user = result.rows[0];
+
+    // Don't allow reset for deactivated accounts
+    if (user.status === 'deactivated') {
+      return res.json({
+        success: true,
+        message: 'If an account with that email exists, a password reset link has been sent.'
+      });
+    }
+
+    // Generate reset token and expiry (1 hour from now)
+    const resetToken = generateResetToken();
+    const resetExpiry = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
+
+    // Save token to database
+    await query(
+      'UPDATE users SET reset_token = $1, reset_token_expires = $2 WHERE id = $3',
+      [resetToken, resetExpiry, user.id]
+    );
+
+    // Send password reset email
+    const emailResult = await sendEmail(user.email, 'passwordReset', [user.first_name, resetToken]);
+    console.log(`Password reset requested for: ${user.email}`);
+
+    // In dev mode (when emails aren't sent), include the reset link in response for testing
+    const response = {
+      success: true,
+      message: 'If an account with that email exists, a password reset link has been sent.'
+    };
+
+    // If in dev mode, provide the reset link directly
+    if (emailResult.dev) {
+      const resetLink = `${process.env.FRONTEND_URL || 'http://localhost:3000'}/reset-password/${resetToken}`;
+      console.log(`[DEV] Reset link: ${resetLink}`);
+      response.devResetLink = resetLink;
+    }
+
+    res.json(response);
+  } catch (error) {
+    console.error('Forgot password error:', error);
+    res.status(500).json({ error: 'Failed to process password reset request' });
+  }
+});
+
+// Verify Reset Token
+router.get('/verify-reset-token/:token', async (req, res) => {
+  try {
+    const { token } = req.params;
+
+    const result = await query(
+      `SELECT id, email, first_name FROM users
+       WHERE reset_token = $1 AND reset_token_expires > NOW()`,
+      [token]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(400).json({
+        valid: false,
+        error: 'Invalid or expired reset token'
+      });
+    }
+
+    res.json({
+      valid: true,
+      email: result.rows[0].email.replace(/(.{2})(.*)(@.*)/, '$1***$3') // Mask email
+    });
+  } catch (error) {
+    console.error('Verify reset token error:', error);
+    res.status(500).json({ error: 'Failed to verify reset token' });
+  }
+});
+
+// Reset Password
+router.post('/reset-password', async (req, res) => {
+  try {
+    const { token, password } = req.body;
+
+    if (!token || !password) {
+      return res.status(400).json({ error: 'Token and password are required' });
+    }
+
+    if (password.length < 8) {
+      return res.status(400).json({ error: 'Password must be at least 8 characters' });
+    }
+
+    // Find user with valid token
+    const result = await query(
+      `SELECT id, email, first_name FROM users
+       WHERE reset_token = $1 AND reset_token_expires > NOW()`,
+      [token]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(400).json({ error: 'Invalid or expired reset token' });
+    }
+
+    const user = result.rows[0];
+
+    // Hash new password
+    const passwordHash = await bcrypt.hash(password, 12);
+
+    // Update password and clear reset token
+    await query(
+      `UPDATE users
+       SET password_hash = $1, reset_token = NULL, reset_token_expires = NULL
+       WHERE id = $2`,
+      [passwordHash, user.id]
+    );
+
+    // Log the password reset
+    await query(
+      `INSERT INTO audit_log (user_id, action, entity_type, entity_id)
+       VALUES ($1, 'password_reset', 'user', $1)`,
+      [user.id]
+    );
+
+    // Send confirmation email
+    await sendEmail(user.email, 'passwordResetSuccess', [user.first_name]);
+    console.log(`Password reset completed for: ${user.email}`);
+
+    res.json({
+      success: true,
+      message: 'Password has been reset successfully. You can now log in with your new password.'
+    });
+  } catch (error) {
+    console.error('Reset password error:', error);
+    res.status(500).json({ error: 'Failed to reset password' });
+  }
 });
 
 module.exports = router;

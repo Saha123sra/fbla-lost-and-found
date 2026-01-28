@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Search, Upload, CheckCircle, ArrowRight, Package } from 'lucide-react';
 import { itemsAPI, testimonialsAPI } from '../services/api';
 import { useLanguage } from '../context/LanguageContext';
+import heroVideo from '../assets/Black White Vintage Film Look Wedding Slideshow Video (1).mp4';
 
 const Home = () => {
   const { t } = useLanguage();
@@ -42,9 +43,9 @@ const Home = () => {
   return (
     <div>
       {/* Hero Section - Split Left/Right */}
-      <section className="w-full h-screen flex flex-col md:flex-row">
-        {/* Left - Colored Section */}
-        <div className="md:w-1/2 w-full bg-gradient-to-br from-navy-800 via-navy-700 to-carolina-500 flex flex-col justify-center px-8 md:px-16 text-white">
+      <section className="w-full min-h-[70vh] lg:h-screen flex flex-row">
+        {/* Left - Colored Section (full width on mobile/tablet, half on desktop) */}
+        <div className="w-full lg:w-1/2 bg-gradient-to-br from-navy-800 via-navy-700 to-carolina-500 flex flex-col justify-center px-8 md:px-16 py-16 lg:py-0 text-white">
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight">
             {t('home.hero.title')}
             <br />
@@ -71,21 +72,18 @@ const Home = () => {
           </div>
         </div>
 
-        {/* Right - Video / Slideshow */}
-        <div className="md:w-1/2 w-full relative flex justify-center items-center overflow-hidden">
-          {/* Replace with your video path */}
+        {/* Right - Video / Slideshow (hidden on mobile/tablet, visible on desktop) */}
+        <div className="hidden lg:flex lg:w-1/2 relative justify-center items-center overflow-hidden bg-navy-900">
           <video
-            src="/videos/lost-dane.mp4"
+            src={heroVideo}
             autoPlay
             loop
             muted
-            className="w-full h-full object-cover"
+            playsInline
+            className="w-full h-full object-cover opacity-90"
           />
-          {/* Optional sliding image overlay */}
-          {/* <div className="absolute w-full h-full flex animate-slide-left">
-            <img src="/images/item1.jpg" alt="Item 1" className="w-full h-full object-cover"/>
-            <img src="/images/item2.jpg" alt="Item 2" className="w-full h-full object-cover"/>
-          </div> */}
+          {/* Subtle overlay for better text contrast if needed */}
+          <div className="absolute inset-0 bg-gradient-to-l from-transparent to-navy-900/20 pointer-events-none" />
         </div>
       </section>
 

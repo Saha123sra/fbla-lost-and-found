@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Crown, Users, Shield, CheckCircle, XCircle, Clock, Package, ClipboardList, UserX } from 'lucide-react';
+import { Crown, Users, Shield, CheckCircle, XCircle, Clock, Package, ClipboardList, UserX, UserCheck } from 'lucide-react';
 import { ownerAPI } from '../services/api';
 import toast from 'react-hot-toast';
 
@@ -70,6 +70,18 @@ const OwnerDashboard = () => {
     }
   };
 
+  const handleReactivate = async (admin) => {
+    if (!window.confirm(`Reactivate admin ${admin.first_name} ${admin.last_name}?`)) return;
+
+    try {
+      const response = await ownerAPI.reactivateAdmin(admin.id);
+      toast.success(`Admin reactivated! New security code: ${response.data.data.securityCode}`);
+      fetchData();
+    } catch (error) {
+      toast.error('Failed to reactivate admin');
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -95,7 +107,7 @@ const OwnerDashboard = () => {
 
       <div className="max-w-7xl mx-auto px-4 py-8">
         {/* Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
+        <div className="grid grid-cols-2 md:grid-cols-6 gap-4 mb-8">
           <div className="bg-white p-4 rounded-xl shadow">
             <div className="text-3xl font-bold text-orange-500">{stats.pending_admins || 0}</div>
             <div className="text-gray-600 text-sm">Pending Admins</div>
@@ -103,6 +115,10 @@ const OwnerDashboard = () => {
           <div className="bg-white p-4 rounded-xl shadow">
             <div className="text-3xl font-bold text-green-600">{stats.active_admins || 0}</div>
             <div className="text-gray-600 text-sm">Active Admins</div>
+          </div>
+          <div className="bg-white p-4 rounded-xl shadow">
+            <div className="text-3xl font-bold text-red-500">{stats.deactivated_admins || 0}</div>
+            <div className="text-gray-600 text-sm">Deactivated</div>
           </div>
           <div className="bg-white p-4 rounded-xl shadow">
             <div className="text-3xl font-bold text-blue-600">{stats.total_students || 0}</div>
@@ -251,6 +267,15 @@ const OwnerDashboard = () => {
                                 >
                                   <UserX className="w-4 h-4" />
                                   Deactivate
+                                </button>
+                              )}
+                              {admin.status === 'deactivated' && (
+                                <button
+                                  onClick={() => handleReactivate(admin)}
+                                  className="text-green-600 hover:text-green-700 text-sm flex items-center gap-1"
+                                >
+                                  <UserCheck className="w-4 h-4" />
+                                  Reactivate
                                 </button>
                               )}
                             </td>

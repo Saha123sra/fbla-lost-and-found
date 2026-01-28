@@ -32,6 +32,9 @@ router.get('/', async (req, res) => {
       status = 'available',
       search,
       location,
+      priority,
+      foundAfter,
+      foundBefore,
       sortBy = 'date_reported',
       sortOrder = 'DESC',
       page = 1,
@@ -45,7 +48,7 @@ router.get('/', async (req, res) => {
     // Build base query
     let queryText = `
       SELECT
-        i.id, i.name, i.description, i.status, i.image_url,
+        i.id, i.name, i.description, i.status, i.image_url, i.priority,
         i.found_date, i.date_reported, i.location_detail, i.ai_tags,
         c.name as category_name, c.icon as category_icon,
         l.name as location_name
@@ -61,9 +64,9 @@ router.get('/', async (req, res) => {
       queryText += ` AND i.status = $${++paramCount}`;
     }
 
-    if (category && category !== 'All') {
+    if (category && category !== 'All' && category !== '') {
       params.push(category);
-      queryText += ` AND c.name = $${++paramCount}`;
+      queryText += ` AND i.category_id = $${++paramCount}`;
     }
 
     if (location) {
@@ -74,6 +77,21 @@ router.get('/', async (req, res) => {
     if (search) {
       params.push(`%${search}%`);
       queryText += ` AND (i.name ILIKE $${++paramCount} OR i.description ILIKE $${paramCount})`;
+    }
+
+    if (priority) {
+      params.push(priority);
+      queryText += ` AND i.priority = $${++paramCount}`;
+    }
+
+    if (foundAfter) {
+      params.push(foundAfter);
+      queryText += ` AND i.found_date >= $${++paramCount}`;
+    }
+
+    if (foundBefore) {
+      params.push(foundBefore);
+      queryText += ` AND i.found_date <= $${++paramCount}`;
     }
 
     // Add sorting
@@ -103,13 +121,25 @@ router.get('/', async (req, res) => {
       countParams.push(status);
       countQuery += ` AND i.status = $${++countParamNum}`;
     }
-    if (category && category !== 'All') {
+    if (category && category !== 'All' && category !== '') {
       countParams.push(category);
-      countQuery += ` AND c.name = $${++countParamNum}`;
+      countQuery += ` AND i.category_id = $${++countParamNum}`;
     }
     if (search) {
       countParams.push(`%${search}%`);
       countQuery += ` AND (i.name ILIKE $${++countParamNum} OR i.description ILIKE $${countParamNum})`;
+    }
+    if (priority) {
+      countParams.push(priority);
+      countQuery += ` AND i.priority = $${++countParamNum}`;
+    }
+    if (foundAfter) {
+      countParams.push(foundAfter);
+      countQuery += ` AND i.found_date >= $${++countParamNum}`;
+    }
+    if (foundBefore) {
+      countParams.push(foundBefore);
+      countQuery += ` AND i.found_date <= $${++countParamNum}`;
     }
 
     const countResult = await query(countQuery, countParams);

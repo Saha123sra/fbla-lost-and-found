@@ -182,8 +182,8 @@ router.post('/', authenticate, upload.single('image'), async (req, res) => {
     }
 
     const result = await query(
-      `INSERT INTO requests (user_id, name, description, category_id, location_id, lost_date, image_url)
-       VALUES ($1, $2, $3, $4, $5, $6, $7)
+      `INSERT INTO requests (user_id, name, description, category_id, location_id, lost_date, image_url, ai_tags)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
        RETURNING *`,
       [
         req.user.id,
@@ -192,7 +192,8 @@ router.post('/', authenticate, upload.single('image'), async (req, res) => {
         categoryId || null,
         locationId || null,
         lostDate || new Date(),
-        imageUrl
+        imageUrl,
+        aiTags ? JSON.stringify(aiTags) : null
       ]
     );
 

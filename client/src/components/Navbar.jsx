@@ -4,32 +4,39 @@ import { Menu, X, LogOut, HelpCircle, Search, Crown } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
 import LanguageSwitcher from './LanguageSwitcher';
+import TextToSpeech from './TextToSpeech';
 import logo from '../assets/logo.png';
 
 const Navbar = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { user, isAuthenticated, isAdmin, isOwner, logout } = useAuth();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const location = useLocation();
 
   const isActive = (path) => location.pathname === path;
 
+  // Use compact styling for Spanish (longer text)
+  const isCompact = language === 'es';
+  const textSize = isCompact ? 'text-xs' : 'text-sm';
+  const navSpacing = isCompact ? 'space-x-4' : 'space-x-6';
+  const iconSize = isCompact ? 'w-3 h-3' : 'w-4 h-4';
+
   return (
     <nav className="bg-navy-800 text-white shadow-lg sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto px-4">
-        <div className="flex justify-between items-center h-16">
+      <div className="w-full px-4 sm:px-6">
+        <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link to="/" className="flex items-center space-x-2 hover:opacity-90 transition flex-shrink-0">
+          <Link to="/" className={`flex items-center ${isCompact ? 'space-x-1' : 'space-x-2'} hover:opacity-90 transition flex-shrink-0 ml-4`}>
             <img
               src={logo}
               alt="Lost Dane Found Logo"
-              className="w-10 h-10 object-cover rounded-full border-2 border-carolina-400 shadow-md transition-transform duration-300 hover:scale-105 hover:shadow-lg"
+              className={`${isCompact ? 'w-8 h-8' : 'w-10 h-10'} object-cover rounded-full border-2 border-carolina-400`}
             />
-            <span className="font-bold text-base xl:text-lg hidden sm:inline whitespace-nowrap">Lost Dane Found</span>
+            <span className={`font-bold ${isCompact ? 'text-sm' : 'text-lg'} hidden lg:inline whitespace-nowrap`}>Lost Dane Found</span>
           </Link>
 
-          {/* Desktop Navigation */}
-          <div className="hidden lg:flex items-center ml-6 space-x-4 xl:space-x-6 text-xs xl:text-sm">
+          {/* Desktop Navigation - evenly spaced */}
+          <div className={`${isCompact ? 'hidden xl:flex' : 'hidden lg:flex'} items-center justify-center flex-1 ${navSpacing} ${textSize}`}>
             <Link
               to="/"
               className={`hover:text-carolina-300 transition py-2 whitespace-nowrap ${isActive('/') ? 'border-b-2 border-carolina-400' : ''}`}
@@ -54,7 +61,7 @@ const Navbar = () => {
                   to="/request"
                   className={`hover:text-carolina-300 transition py-2 flex items-center gap-1 whitespace-nowrap ${isActive('/request') ? 'border-b-2 border-carolina-400' : ''}`}
                 >
-                  <Search className="w-3 h-3 xl:w-4 xl:h-4" />
+                  <Search className={iconSize} />
                   {t('nav.lostItem')}
                 </Link>
                 <Link
@@ -69,7 +76,7 @@ const Navbar = () => {
               to="/faq"
               className={`hover:text-carolina-300 transition py-2 flex items-center gap-1 whitespace-nowrap ${isActive('/faq') ? 'border-b-2 border-carolina-400' : ''}`}
             >
-              <HelpCircle className="w-3 h-3 xl:w-4 xl:h-4" />
+              <HelpCircle className={iconSize} />
               {t('nav.faq')}
             </Link>
             {isAdmin && (
@@ -85,37 +92,39 @@ const Navbar = () => {
                 to="/owner/dashboard"
                 className={`hover:text-carolina-300 transition py-2 flex items-center gap-1 whitespace-nowrap ${location.pathname.startsWith('/owner') ? 'border-b-2 border-carolina-400' : ''}`}
               >
-                <Crown className="w-3 h-3 xl:w-4 xl:h-4 text-yellow-300" />
+                <Crown className={`${iconSize} text-yellow-300`} />
                 {t('nav.owner')}
               </Link>
             )}
           </div>
 
-          {/* Right side - Language & Login/Signup */}
-          <div className="hidden lg:flex items-center ml-4 space-x-3 flex-shrink-0">
+          {/* Right side - TTS, Language & Login/Signup */}
+          <div className={`${isCompact ? 'hidden xl:flex' : 'hidden lg:flex'} items-center ${isCompact ? 'space-x-2' : 'space-x-3'} flex-shrink-0`}>
+            <TextToSpeech />
             <LanguageSwitcher />
             {isAuthenticated ? (
               <div className="flex items-center space-x-2">
-                <span className="text-carolina-300 text-xs truncate max-w-[60px]">{user?.name?.split(' ')[0]}</span>
+                <span className={`text-carolina-300 ${textSize} whitespace-nowrap`}>{user?.name?.split(' ')[0]}</span>
                 <button
                   onClick={logout}
-                  className="flex items-center gap-1 text-xs hover:text-carolina-300 transition"
+                  className="flex items-center hover:text-carolina-300 transition p-1"
                   title={t('nav.logout')}
+                  aria-label={t('nav.logout')}
                 >
-                  <LogOut className="w-3 h-3 xl:w-4 xl:h-4" />
+                  <LogOut className="w-4 h-4" />
                 </button>
               </div>
             ) : (
               <>
                 <Link
                   to="/login"
-                  className="hover:text-carolina-300 transition px-2 py-2 text-xs xl:text-sm whitespace-nowrap"
+                  className={`hover:text-carolina-300 transition ${textSize} whitespace-nowrap`}
                 >
                   {t('nav.login')}
                 </Link>
                 <Link
                   to="/register/student"
-                  className="bg-carolina-400 text-navy-900 px-2 py-1.5 rounded-lg font-medium hover:bg-carolina-300 transition text-xs xl:text-sm whitespace-nowrap"
+                  className={`bg-carolina-400 text-navy-900 ${isCompact ? 'px-2 py-1' : 'px-3 py-1.5'} rounded-lg font-medium hover:bg-carolina-300 transition ${textSize} whitespace-nowrap`}
                 >
                   {t('nav.signUp')}
                 </Link>
@@ -125,8 +134,10 @@ const Navbar = () => {
 
           {/* Mobile menu button */}
           <button
-            className="lg:hidden p-2"
+            className={`${isCompact ? 'xl:hidden' : 'lg:hidden'} p-2`}
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
+            aria-expanded={mobileMenuOpen}
           >
             {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>
@@ -134,9 +145,10 @@ const Navbar = () => {
 
         {/* Mobile Navigation */}
         {mobileMenuOpen && (
-          <div className="lg:hidden pb-4 border-t border-navy-700 mt-2 pt-4 space-y-2">
-            {/* Language Switcher for Mobile */}
-            <div className="px-2 pb-2 border-b border-navy-700 mb-2">
+          <div className={`${isCompact ? 'xl:hidden' : 'lg:hidden'} pb-4 border-t border-navy-700 mt-2 pt-4 space-y-2`}>
+            {/* TTS and Language Switcher for Mobile */}
+            <div className="px-2 pb-2 border-b border-navy-700 mb-2 flex items-center gap-3">
+              <TextToSpeech />
               <LanguageSwitcher />
             </div>
             <Link to="/" className="block py-2 px-2 hover:bg-navy-700 rounded" onClick={() => setMobileMenuOpen(false)}>{t('nav.home')}</Link>

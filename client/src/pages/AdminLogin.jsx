@@ -163,6 +163,10 @@ const AdminLogin = () => {
           </form>
 
           <div className="mt-6 text-center text-sm text-gray-600">
+            <Link to="/forgot-password" className="hover:underline">
+              Forgot Password?
+            </Link>
+            <span className="mx-2">|</span>
             {loginType === 'admin' && (
               <>
                 <Link to="/register/admin" className="text-navy-600 hover:underline">

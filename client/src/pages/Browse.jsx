@@ -119,7 +119,7 @@ const Browse = () => {
     };
     const labels = {
       available: 'Available',
-      pending: 'Pending',
+      pending: 'Pending Claim',
       claimed: 'Claimed'
     };
     return (

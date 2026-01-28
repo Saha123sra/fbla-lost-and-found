@@ -52,6 +52,14 @@ const Login = () => {
               {t('nav.signUp')}
             </span>
           </p>
+          <p className="text-gray-500 text-sm mt-2">
+            <span
+              onClick={() => navigate('/forgot-password')}
+              className="text-navy-600 hover:text-navy-700 cursor-pointer hover:underline"
+            >
+              {t('auth.forgotPassword', 'Forgot Password?')}
+            </span>
+          </p>
         </div>
       </div>
     </div>

@@ -360,7 +360,7 @@ INSERT INTO users (student_id, email, password_hash, first_name, last_name, role
 VALUES (
     'owner',
     'demo@lostdanefound.com',
-    '$2a$12$5HdBMQQPdpQ.Q8.Q/QBK4ODNWA4JO67JZ8EI0.pw6bYrPg11TqflW',
+    '$2a$12$2K53EqrPE6WFsgc1Om7ga.i8NfTo1RfRw5ocCR.n5VyoipW/d8qMS',
     'Demo',
     'Owner',
     'owner',

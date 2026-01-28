@@ -186,6 +186,57 @@ router.post('/deactivate-admin/:id', authenticate, requireOwner, async (req, res
   }
 });
 
+// Reactivate a deactivated admin
+router.post('/reactivate-admin/:id', authenticate, requireOwner, async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Generate new security code and expiration (90 days from now)
+    const securityCode = generateSecurityCode();
+    const codeExpiration = new Date();
+    codeExpiration.setDate(codeExpiration.getDate() + 90);
+
+    const result = await query(
+      `UPDATE users
+       SET status = 'active', security_code = $1, code_expires_at = $2
+       WHERE id = $3 AND role = 'admin' AND status = 'deactivated'
+       RETURNING id, email, first_name, last_name, security_code`,
+      [securityCode, codeExpiration, id]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Deactivated admin not found' });
+    }
+
+    const admin = result.rows[0];
+
+    // Log the reactivation
+    await query(
+      `INSERT INTO audit_log (user_id, action, entity_type, entity_id, new_values)
+       VALUES ($1, 'admin_reactivated', 'user', $2, $3)`,
+      [req.user.id, id, JSON.stringify({ reactivated_by: req.user.email })]
+    );
+
+    // Send email with new security code
+    await sendEmail(admin.email, 'adminReactivated', [admin.first_name, securityCode]);
+    console.log(`Admin reactivated: ${admin.email}, New Security Code: ${securityCode}`);
+
+    res.json({
+      success: true,
+      message: 'Admin account reactivated',
+      data: {
+        id: admin.id,
+        email: admin.email,
+        name: `${admin.first_name} ${admin.last_name}`,
+        securityCode: admin.security_code
+      }
+    });
+  } catch (error) {
+    console.error('Reactivate admin error:', error);
+    res.status(500).json({ error: 'Failed to reactivate admin' });
+  }
+});
+
 // Get owner dashboard stats
 router.get('/stats', authenticate, requireOwner, async (req, res) => {
   try {
@@ -193,6 +244,7 @@ router.get('/stats', authenticate, requireOwner, async (req, res) => {
       SELECT
         (SELECT COUNT(*) FROM users WHERE role = 'admin' AND status = 'pending') as pending_admins,
         (SELECT COUNT(*) FROM users WHERE role = 'admin' AND status = 'active') as active_admins,
+        (SELECT COUNT(*) FROM users WHERE role = 'admin' AND status = 'deactivated') as deactivated_admins,
         (SELECT COUNT(*) FROM users WHERE role = 'student') as total_students,
         (SELECT COUNT(*) FROM items WHERE status = 'available') as active_items,
         (SELECT COUNT(*) FROM claims WHERE status = 'pending') as pending_claims

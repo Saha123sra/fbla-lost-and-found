@@ -26,6 +26,8 @@ import MyRequests from './pages/MyRequests';
 import OwnerLogin from './pages/OwnerLogin';
 import OwnerDashboard from './pages/OwnerDashboard';
 import VerifyOTP from './pages/VerifyOTP';
+import ForgotPassword from './pages/ForgotPassword';
+import ResetPassword from './pages/ResetPassword';
 
 // Protected route wrapper
 const ProtectedRoute = ({ children, adminOnly = false, ownerOnly = false }) => {
@@ -87,6 +89,8 @@ const App = () => {
           <Route path="/register/student" element={<StudentRegister />} />
           <Route path="/register/admin" element={<AdminRegister />} />
           <Route path="/verify-otp" element={<VerifyOTP />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password/:token" element={<ResetPassword />} />
 
           {/* Protected routes */}
           <Route
@@ -129,7 +133,6 @@ const App = () => {
               </ProtectedRoute>
             }
           />
-
           {/* Admin routes */}
           <Route
             path="/admin/*"

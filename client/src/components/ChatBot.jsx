@@ -25,27 +25,48 @@ const FloatingChatbot = () => {
   const getBotResponse = (userMessage) => {
     const lower = userMessage.toLowerCase();
 
-    if (lower.match(/^(hi|hello|hey)/)) {
+    // Greetings
+    if (lower.match(/^(hi|hello|hey|good morning|good afternoon)/)) {
       return "Hello! 👋 Are you looking for a lost item or reporting something you found?";
     }
 
-    if (lower.includes('lost') || lower.includes('find')) {
-      return "To find a lost item:\n\n1️⃣ Go to **Browse Items**\n2️⃣ Use filters to search\n3️⃣ Submit a claim if you find a match\n\nWant me to take you there?";
+    // User is SEARCHING for items (asking if something exists, looking for something)
+    if (lower.match(/are there|is there|any .*(found|available|lost)|looking for|search|browse|find my|where.*(my|is)|have you seen/)) {
+      return "To search for items:\n\n1️⃣ Go to **Browse Items**\n2️⃣ Use filters (category, date, location)\n3️⃣ Found a match? Submit a claim!\n\n🔗 [Browse Items](/browse)";
     }
 
-    if (lower.includes('found') || lower.includes('report')) {
-      return "Thanks for helping! 🐕\n\nGo to **Report Found Item**, upload a photo, and add details. We'll handle the rest!";
+    // User LOST something
+    if (lower.includes('i lost') || lower.includes("i've lost") || lower.includes('lost my') || lower.includes('missing')) {
+      return "Sorry to hear that! 😟\n\nHere's what to do:\n\n1️⃣ **Browse Items** to see if it's been found\n2️⃣ **Submit a Lost Item Request** so we can notify you if it turns up\n\n🔗 [Browse Items](/browse)\n🔗 [Report Lost Item](/request)";
     }
 
-    if (lower.includes('claim')) {
-      return "Claim process:\n\n• Submit proof of ownership\n• Admin reviews (24 hrs)\n• Get pickup instructions by email\n• Bring your student ID";
+    // User FOUND something and wants to report it
+    if (lower.match(/i found|found a|found an|report.*(found|item)|turn in|submit.*found|want to report/)) {
+      return "Thanks for helping! 🐕\n\nGo to **Report Found Item**, upload a photo, and add details. We'll handle the rest!\n\n🔗 [Report Found Item](/report)";
     }
 
-    if (lower.includes('where') || lower.includes('location')) {
-      return "📍 Lost & Found: Main Office, Room 101\n🕐 7:30 AM – 4:00 PM";
+    // Claim process questions
+    if (lower.includes('claim') || lower.includes('how do i get') || lower.includes('pick up') || lower.includes('retrieve')) {
+      return "Claim process:\n\n1️⃣ Find your item in Browse Items\n2️⃣ Click 'Claim' and provide proof of ownership\n3️⃣ Admin reviews within 24 hours\n4️⃣ Get pickup instructions by email\n5️⃣ Bring your student ID to collect\n\n🔗 [My Claims](/my-claims)";
     }
 
-    return "I can help with:\n\n• Lost items\n• Found items\n• Claims\n• Location\n\nWhat do you need?";
+    // Location questions
+    if (lower.includes('where') || lower.includes('location') || lower.includes('office') || lower.includes('hours')) {
+      return "📍 **Lost & Found Office**\nMain Office, Room 101\n\n🕐 **Hours**\nMonday - Friday: 7:30 AM – 4:00 PM";
+    }
+
+    // How does it work
+    if (lower.includes('how') && (lower.includes('work') || lower.includes('use'))) {
+      return "Here's how Lost Dane Found works:\n\n🔍 **Lost something?**\nBrowse items or submit a lost item request\n\n📦 **Found something?**\nReport it so the owner can find it\n\n✅ **Claiming**\nSubmit proof, get verified, pick up!";
+    }
+
+    // Thanks
+    if (lower.match(/thank|thanks|thx/)) {
+      return "You're welcome! 🎉 Let me know if you need anything else.";
+    }
+
+    // Default fallback
+    return "I can help with:\n\n🔍 Searching for lost items\n📦 Reporting found items\n✅ Claim process\n📍 Office location & hours\n\nWhat would you like to know?";
   };
 
   const handleSend = () => {
