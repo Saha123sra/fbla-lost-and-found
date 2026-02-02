@@ -85,7 +85,7 @@ const ItemDetail = () => {
       <div className="max-w-4xl mx-auto px-4">
         {/* Back Button */}
         <button
-          onClick={() => navigate(-1)}
+          onClick={() => navigate('/browse')}
           className="flex items-center text-navy-600 hover:text-navy-700 mb-6 group"
         >
           <ArrowLeft className="w-5 h-5 mr-1 group-hover:-translate-x-1 transition" />
