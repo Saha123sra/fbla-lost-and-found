@@ -2,9 +2,11 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, Crown, Shield } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useLanguage } from '../context/LanguageContext';
 // Force rebuild: v2.0 - OTP-based admin authentication
 
 const AdminLogin = () => {
+  const { t } = useLanguage();
   const [loginType, setLoginType] = useState('owner'); // 'owner' or 'admin'
   const [email, setEmail] = useState('');
   const [adminId, setAdminId] = useState('');
@@ -62,7 +64,7 @@ const AdminLogin = () => {
       <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden">
         <div className="bg-navy-700 text-white p-8 text-center">
           <h1 className="text-2xl font-bold">
-            {loginType === 'owner' ? 'Owner Login' : 'Admin Login'}
+            {loginType === 'owner' ? t('auth.ownerLogin') : t('auth.adminLogin')}
           </h1>
         </div>
 
@@ -79,7 +81,7 @@ const AdminLogin = () => {
               }`}
             >
               <Crown className="w-4 h-4" />
-              Site Owner
+              {t('auth.siteOwner') || 'Site Owner'}
             </button>
             <button
               type="button"
@@ -91,7 +93,7 @@ const AdminLogin = () => {
               }`}
             >
               <Shield className="w-4 h-4" />
-              Admin
+              {t('nav.admin')}
             </button>
           </div>
 
@@ -106,7 +108,7 @@ const AdminLogin = () => {
               /* Owner Login - Email only */
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Email
+                  {t('auth.email')}
                 </label>
                 <input
                   type="email"
@@ -120,13 +122,13 @@ const AdminLogin = () => {
               /* Admin Login - Admin ID */
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Admin ID
+                  {t('auth.adminId') || 'Admin ID'}
                 </label>
                 <input
                   type="text"
                   value={adminId}
                   onChange={(e) => setAdminId(e.target.value)}
-                  placeholder="Enter your admin ID"
+                  placeholder={t('auth.enterAdminId') || 'Enter your admin ID'}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-navy-500 outline-none transition"
                 />
               </div>
@@ -134,14 +136,14 @@ const AdminLogin = () => {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Password
+                {t('auth.password')}
               </label>
               <div className="relative">
                 <input
                   type={showPassword ? 'text' : 'password'}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Enter your password"
+                  placeholder={t('auth.enterPassword') || 'Enter your password'}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-navy-500 outline-none transition pr-12"
                 />
                 <button
@@ -159,25 +161,25 @@ const AdminLogin = () => {
               disabled={loading}
               className="w-full bg-navy-600 text-white py-3 rounded-lg font-bold hover:bg-navy-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {loading ? 'Signing in...' : 'Sign In'}
+              {loading ? t('common.loading') : t('auth.login')}
             </button>
           </form>
 
           <div className="mt-6 text-center text-sm text-gray-600">
             <Link to="/forgot-password" className="hover:underline">
-              Forgot Password?
+              {t('auth.forgotPassword')}
             </Link>
             <span className="mx-2">|</span>
             {loginType === 'admin' && (
               <>
                 <Link to="/register/admin" className="text-navy-600 hover:underline">
-                  Register as Admin
+                  {t('auth.registerAsAdmin') || 'Register as Admin'}
                 </Link>
                 <span className="mx-2">|</span>
               </>
             )}
             <Link to="/login" className="hover:underline">
-              Student Login
+              {t('auth.studentLogin') || 'Student Login'}
             </Link>
           </div>
         </div>

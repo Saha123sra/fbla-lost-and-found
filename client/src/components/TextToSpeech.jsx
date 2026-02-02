@@ -1,7 +1,27 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Volume2, Pause, Play, Square, Settings } from 'lucide-react';
+import { useLanguage } from '../context/LanguageContext';
+
+// Map app language codes to speech synthesis language codes
+const languageToSpeechCode = {
+  en: ['en-US', 'en-GB', 'en-AU', 'en'],
+  es: ['es-ES', 'es-MX', 'es-US', 'es'],
+  hi: ['hi-IN', 'hi'],
+  fr: ['fr-FR', 'fr-CA', 'fr'],
+  zh: ['zh-CN', 'zh-TW', 'zh-HK', 'zh']
+};
+
+// Language display names for the UI
+const languageNames = {
+  en: 'English',
+  es: 'Spanish',
+  hi: 'Hindi',
+  fr: 'French',
+  zh: 'Chinese'
+};
 
 const TextToSpeech = () => {
+  const { language, t } = useLanguage();
   const [isOpen, setIsOpen] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
@@ -12,23 +32,41 @@ const TextToSpeech = () => {
   const dropdownRef = useRef(null);
   const speakingLockRef = useRef(false);
 
-  // Load available voices - prefer American English
+  // Find the best voice for a given language
+  const findBestVoice = useCallback((availableVoices, langCode) => {
+    const speechCodes = languageToSpeechCode[langCode] || languageToSpeechCode.en;
+
+    // Try each preferred speech code in order
+    for (const code of speechCodes) {
+      // First try to find a premium/natural voice
+      const premiumVoice = availableVoices.find(v =>
+        v.lang === code && (v.name.includes('Natural') || v.name.includes('Premium') || v.name.includes('Enhanced'))
+      );
+      if (premiumVoice) return premiumVoice;
+
+      // Then try exact match
+      const exactMatch = availableVoices.find(v => v.lang === code);
+      if (exactMatch) return exactMatch;
+
+      // Try prefix match (e.g., 'en' matches 'en-US')
+      const prefixMatch = availableVoices.find(v => v.lang.startsWith(code.split('-')[0]));
+      if (prefixMatch) return prefixMatch;
+    }
+
+    // Fallback to first available voice
+    return availableVoices[0];
+  }, []);
+
+  // Load available voices
   useEffect(() => {
     const loadVoices = () => {
       const availableVoices = window.speechSynthesis.getVoices();
       setVoices(availableVoices);
 
-      // Prioritize American English voices - prefer natural/premium voices
-      const americanVoice = availableVoices.find(v =>
-        v.lang === 'en-US' && v.name.includes('Samantha')
-      ) || availableVoices.find(v =>
-        v.lang === 'en-US' && (v.name.includes('Natural') || v.name.includes('Premium'))
-      ) || availableVoices.find(v => v.lang === 'en-US')
-        || availableVoices.find(v => v.lang.startsWith('en'))
-        || availableVoices[0];
-
-      if (americanVoice && !selectedVoice) {
-        setSelectedVoice(americanVoice);
+      // Select voice based on current app language
+      const bestVoice = findBestVoice(availableVoices, language);
+      if (bestVoice) {
+        setSelectedVoice(bestVoice);
       }
     };
 
@@ -39,7 +77,17 @@ const TextToSpeech = () => {
       window.speechSynthesis.cancel();
       speakingLockRef.current = false;
     };
-  }, []);
+  }, [language, findBestVoice]);
+
+  // Update voice when language changes
+  useEffect(() => {
+    if (voices.length > 0 && !isSpeaking) {
+      const bestVoice = findBestVoice(voices, language);
+      if (bestVoice) {
+        setSelectedVoice(bestVoice);
+      }
+    }
+  }, [language, voices, isSpeaking, findBestVoice]);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -179,8 +227,23 @@ const TextToSpeech = () => {
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [startReading, stopReading]);
 
-  // Filter to show only English voices
-  const englishVoices = voices.filter(v => v.lang.startsWith('en'));
+  // Filter voices for current language
+  const currentLanguageVoices = voices.filter(v => {
+    const speechCodes = languageToSpeechCode[language] || languageToSpeechCode.en;
+    const langPrefix = speechCodes[speechCodes.length - 1]; // Get the base code like 'en', 'es', 'hi', etc.
+    return v.lang.startsWith(langPrefix);
+  });
+
+  // Group voices by region/variant
+  const primaryVoices = currentLanguageVoices.filter(v => {
+    const primaryCode = (languageToSpeechCode[language] || languageToSpeechCode.en)[0];
+    return v.lang === primaryCode;
+  });
+
+  const otherVoices = currentLanguageVoices.filter(v => {
+    const primaryCode = (languageToSpeechCode[language] || languageToSpeechCode.en)[0];
+    return v.lang !== primaryCode;
+  });
 
   return (
     <div className="relative" ref={dropdownRef}>
@@ -212,9 +275,14 @@ const TextToSpeech = () => {
           className="absolute right-0 top-full mt-2 w-64 bg-white rounded-xl shadow-xl border border-gray-200 overflow-hidden z-50"
         >
           {/* Header */}
-          <div className="bg-navy-700 text-white px-4 py-3 flex items-center gap-2">
-            <Volume2 className="w-4 h-4" />
-            <span className="font-semibold text-sm">Text-to-Speech</span>
+          <div className="bg-navy-700 text-white px-4 py-3 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Volume2 className="w-4 h-4" />
+              <span className="font-semibold text-sm">Text-to-Speech</span>
+            </div>
+            <span className="text-xs bg-navy-600 px-2 py-0.5 rounded">
+              {languageNames[language]}
+            </span>
           </div>
 
           {/* Controls */}
@@ -283,7 +351,7 @@ const TextToSpeech = () => {
                 {/* Voice selection */}
                 <div>
                   <label htmlFor="tts-voice" className="block text-xs font-medium text-gray-600 mb-1">
-                    Voice {isSpeaking && <span className="text-orange-500">(stop to change)</span>}
+                    Voice ({languageNames[language]}) {isSpeaking && <span className="text-orange-500">(stop to change)</span>}
                   </label>
                   <select
                     id="tts-voice"
@@ -296,21 +364,36 @@ const TextToSpeech = () => {
                     className="w-full px-2 py-1.5 border border-gray-300 rounded-lg text-xs focus:ring-2 focus:ring-navy-500 outline-none disabled:opacity-50 disabled:cursor-not-allowed"
                     aria-label="Select voice"
                   >
-                    <optgroup label="American English">
-                      {englishVoices.filter(v => v.lang === 'en-US').map((voice) => (
-                        <option key={voice.name} value={voice.name}>
-                          {voice.name}
-                        </option>
-                      ))}
-                    </optgroup>
-                    <optgroup label="Other English">
-                      {englishVoices.filter(v => v.lang !== 'en-US').map((voice) => (
-                        <option key={voice.name} value={voice.name}>
-                          {voice.name} ({voice.lang})
-                        </option>
-                      ))}
-                    </optgroup>
+                    {currentLanguageVoices.length === 0 ? (
+                      <option value="">No voices available for {languageNames[language]}</option>
+                    ) : (
+                      <>
+                        {primaryVoices.length > 0 && (
+                          <optgroup label={`${languageNames[language]} (Primary)`}>
+                            {primaryVoices.map((voice) => (
+                              <option key={voice.name} value={voice.name}>
+                                {voice.name}
+                              </option>
+                            ))}
+                          </optgroup>
+                        )}
+                        {otherVoices.length > 0 && (
+                          <optgroup label={`${languageNames[language]} (Other)`}>
+                            {otherVoices.map((voice) => (
+                              <option key={voice.name} value={voice.name}>
+                                {voice.name} ({voice.lang})
+                              </option>
+                            ))}
+                          </optgroup>
+                        )}
+                      </>
+                    )}
                   </select>
+                  {currentLanguageVoices.length === 0 && (
+                    <p className="text-[10px] text-orange-500 mt-1">
+                      Your browser may not have {languageNames[language]} voices installed.
+                    </p>
+                  )}
                 </div>
 
                 {/* Speed control */}

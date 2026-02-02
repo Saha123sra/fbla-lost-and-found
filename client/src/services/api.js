@@ -65,7 +65,23 @@ export const itemsAPI = {
       headers: { 'Content-Type': 'multipart/form-data' }
     });
   },
-  update: (id, data) => api.patch(`/items/${id}`, data),
+  update: (id, data) => {
+    // Check if data contains a file (image)
+    if (data instanceof FormData || data.image) {
+      const formData = data instanceof FormData ? data : new FormData();
+      if (!(data instanceof FormData)) {
+        Object.keys(data).forEach(key => {
+          if (data[key] !== null && data[key] !== undefined) {
+            formData.append(key, data[key]);
+          }
+        });
+      }
+      return api.patch(`/items/${id}`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+    }
+    return api.patch(`/items/${id}`, data);
+  },
   delete: (id) => api.delete(`/items/${id}`),
   getCategories: () => api.get('/items/meta/categories'),
   getLocations: () => api.get('/items/meta/locations')

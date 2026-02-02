@@ -5,6 +5,7 @@ import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
 import LanguageSwitcher from './LanguageSwitcher';
 import TextToSpeech from './TextToSpeech';
+import ThemeSwitcher from './ThemeSwitcher';
 import logo from '../assets/logo.png';
 
 const Navbar = () => {
@@ -15,28 +16,31 @@ const Navbar = () => {
 
   const isActive = (path) => location.pathname === path;
 
-  // Use compact styling for Spanish (longer text)
-  const isCompact = language === 'es';
-  const textSize = isCompact ? 'text-xs' : 'text-sm';
-  const navSpacing = isCompact ? 'space-x-4' : 'space-x-6';
-  const iconSize = isCompact ? 'w-3 h-3' : 'w-4 h-4';
+  // Use compact styling for languages with longer text
+  const isVeryCompact = language === 'es'; // Spanish needs smallest
+  const isCompact = language === 'fr'; // French medium compact
+  const isSemiCompact = language === 'hi'; // Hindi just needs tighter spacing
+  const textSize = isVeryCompact ? 'text-xs' : (isCompact ? 'text-[13px]' : 'text-sm');
+  const navSpacing = isVeryCompact ? 'space-x-5' : ((isCompact || isSemiCompact) ? 'space-x-6' : 'space-x-8');
+  const iconSize = (isVeryCompact || isCompact) ? 'w-3 h-3' : 'w-4 h-4';
+  const needsXLBreakpoint = isVeryCompact || isCompact || isSemiCompact;
 
   return (
     <nav className="bg-navy-800 text-white shadow-lg sticky top-0 z-50">
       <div className="w-full px-4 sm:px-6">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link to="/" className={`flex items-center ${isCompact ? 'space-x-1' : 'space-x-2'} hover:opacity-90 transition flex-shrink-0 ml-4`}>
+          <Link to="/" className={`flex items-center ${needsXLBreakpoint ? 'space-x-1' : 'space-x-2'} hover:opacity-90 transition flex-shrink-0 ml-4`}>
             <img
               src={logo}
               alt="Lost Dane Found Logo"
-              className={`${isCompact ? 'w-8 h-8' : 'w-10 h-10'} object-cover rounded-full border-2 border-carolina-400`}
+              className={`${isVeryCompact ? 'w-8 h-8' : 'w-10 h-10'} object-cover rounded-full border-2 border-carolina-400`}
             />
-            <span className={`font-bold ${isCompact ? 'text-sm' : 'text-lg'} hidden lg:inline whitespace-nowrap`}>Lost Dane Found</span>
+            <span className={`font-bold ${isVeryCompact ? 'text-sm' : 'text-lg'} hidden lg:inline whitespace-nowrap`}>Lost Dane Found</span>
           </Link>
 
           {/* Desktop Navigation - evenly spaced */}
-          <div className={`${isCompact ? 'hidden xl:flex' : 'hidden lg:flex'} items-center justify-center flex-1 ${navSpacing} ${textSize}`}>
+          <div className={`${needsXLBreakpoint ? 'hidden xl:flex' : 'hidden lg:flex'} items-center justify-center flex-1 ${navSpacing} ${textSize}`}>
             <Link
               to="/"
               className={`hover:text-carolina-300 transition py-2 whitespace-nowrap ${isActive('/') ? 'border-b-2 border-carolina-400' : ''}`}
@@ -98,9 +102,10 @@ const Navbar = () => {
             )}
           </div>
 
-          {/* Right side - TTS, Language & Login/Signup */}
-          <div className={`${isCompact ? 'hidden xl:flex' : 'hidden lg:flex'} items-center ${isCompact ? 'space-x-2' : 'space-x-3'} flex-shrink-0`}>
+          {/* Right side - TTS, Theme, Language & Login/Signup */}
+          <div className={`${needsXLBreakpoint ? 'hidden xl:flex' : 'hidden lg:flex'} items-center ${needsXLBreakpoint ? 'space-x-2' : 'space-x-3'} flex-shrink-0`}>
             <TextToSpeech />
+            <ThemeSwitcher />
             <LanguageSwitcher />
             {isAuthenticated ? (
               <div className="flex items-center space-x-2">
@@ -124,7 +129,7 @@ const Navbar = () => {
                 </Link>
                 <Link
                   to="/register/student"
-                  className={`bg-carolina-400 text-navy-900 ${isCompact ? 'px-2 py-1' : 'px-3 py-1.5'} rounded-lg font-medium hover:bg-carolina-300 transition ${textSize} whitespace-nowrap`}
+                  className={`bg-carolina-400 text-navy-900 ${isVeryCompact ? 'px-2 py-1' : 'px-3 py-1.5'} rounded-lg font-medium hover:bg-carolina-300 transition ${textSize} whitespace-nowrap`}
                 >
                   {t('nav.signUp')}
                 </Link>
@@ -134,7 +139,7 @@ const Navbar = () => {
 
           {/* Mobile menu button */}
           <button
-            className={`${isCompact ? 'xl:hidden' : 'lg:hidden'} p-2`}
+            className={`${needsXLBreakpoint ? 'xl:hidden' : 'lg:hidden'} p-2`}
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
             aria-expanded={mobileMenuOpen}
@@ -145,10 +150,11 @@ const Navbar = () => {
 
         {/* Mobile Navigation */}
         {mobileMenuOpen && (
-          <div className={`${isCompact ? 'xl:hidden' : 'lg:hidden'} pb-4 border-t border-navy-700 mt-2 pt-4 space-y-2`}>
-            {/* TTS and Language Switcher for Mobile */}
+          <div className={`${needsXLBreakpoint ? 'xl:hidden' : 'lg:hidden'} pb-4 border-t border-navy-700 mt-2 pt-4 space-y-2`}>
+            {/* TTS, Theme and Language Switcher for Mobile */}
             <div className="px-2 pb-2 border-b border-navy-700 mb-2 flex items-center gap-3">
               <TextToSpeech />
+              <ThemeSwitcher />
               <LanguageSwitcher />
             </div>
             <Link to="/" className="block py-2 px-2 hover:bg-navy-700 rounded" onClick={() => setMobileMenuOpen(false)}>{t('nav.home')}</Link>

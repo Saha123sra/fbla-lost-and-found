@@ -2,9 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Search, Package, Calendar, MapPin, X, ExternalLink, Trash2 } from 'lucide-react';
 import { requestsAPI } from '../services/api';
+import { useLanguage } from '../context/LanguageContext';
 import toast from 'react-hot-toast';
 
 const MyRequests = () => {
+  const { t, language } = useLanguage();
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -43,9 +45,16 @@ const MyRequests = () => {
       expired: 'bg-yellow-100 text-yellow-700'
     };
 
+    const labels = {
+      active: t('myRequests.status.active'),
+      matched: t('myRequests.status.matched'),
+      cancelled: t('myRequests.status.cancelled'),
+      expired: t('myRequests.status.expired') || 'Expired'
+    };
+
     return (
       <span className={`px-2 py-1 rounded-full text-xs font-medium ${styles[status] || styles.active}`}>
-        {status.charAt(0).toUpperCase() + status.slice(1)}
+        {labels[status] || status.charAt(0).toUpperCase() + status.slice(1)}
       </span>
     );
   };
@@ -63,30 +72,30 @@ const MyRequests = () => {
       <div className="max-w-4xl mx-auto px-4">
         <div className="flex justify-between items-center mb-6">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">My Lost Item Requests</h1>
-            <p className="text-gray-600">Track items you've pre-registered as lost</p>
+            <h1 className="text-2xl font-bold text-gray-900">{t('myRequests.title')}</h1>
+            <p className="text-gray-600">{t('myRequests.subtitle') || 'Track items you\'ve pre-registered as lost'}</p>
           </div>
           <Link
             to="/request"
             className="bg-navy-600 text-white px-4 py-2 rounded-lg hover:bg-navy-700 transition flex items-center gap-2"
           >
             <Search className="w-4 h-4" />
-            New Request
+            {t('myRequests.newRequest') || 'New Request'}
           </Link>
         </div>
 
         {requests.length === 0 ? (
           <div className="bg-white rounded-xl shadow p-8 text-center">
             <Package className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-            <h3 className="text-xl font-medium text-gray-700 mb-2">No requests yet</h3>
+            <h3 className="text-xl font-medium text-gray-700 mb-2">{t('myRequests.noRequests')}</h3>
             <p className="text-gray-500 mb-4">
-              Pre-register lost items to get notified when they're found
+              {t('myRequests.noRequestsDesc') || 'Pre-register lost items to get notified when they\'re found'}
             </p>
             <Link
               to="/request"
               className="inline-block bg-navy-600 text-white px-6 py-2 rounded-lg hover:bg-navy-700 transition"
             >
-              Create Request
+              {t('myRequests.createNew')}
             </Link>
           </div>
         ) : (
@@ -121,7 +130,7 @@ const MyRequests = () => {
                           )}
                           <span className="flex items-center gap-1">
                             <Calendar className="w-4 h-4" />
-                            Lost {new Date(request.lost_date).toLocaleDateString()}
+                            {t('myRequests.dateLost')}: {new Date(request.lost_date).toLocaleDateString(language === 'zh' ? 'zh-CN' : language === 'hi' ? 'hi-IN' : language)}
                           </span>
                         </div>
                       </div>
@@ -140,7 +149,7 @@ const MyRequests = () => {
                           className="flex items-center gap-1 text-green-600 hover:text-green-700 text-sm font-medium"
                         >
                           <ExternalLink className="w-4 h-4" />
-                          View Match
+                          {t('myRequests.viewMatch') || 'View Match'}
                         </Link>
                       )}
                       {request.status === 'active' && (
@@ -149,7 +158,7 @@ const MyRequests = () => {
                           className="flex items-center gap-1 text-red-600 hover:text-red-700 text-sm"
                         >
                           <Trash2 className="w-4 h-4" />
-                          Cancel
+                          {t('myRequests.cancel')}
                         </button>
                       )}
                     </div>
@@ -162,10 +171,9 @@ const MyRequests = () => {
 
         {/* Info Card */}
         <div className="mt-8 bg-blue-50 border border-blue-200 rounded-xl p-4">
-          <h3 className="font-medium text-blue-800 mb-2">How matching works</h3>
+          <h3 className="font-medium text-blue-800 mb-2">{t('myRequests.howMatchingWorks') || 'How matching works'}</h3>
           <p className="text-blue-700 text-sm">
-            When someone reports a found item that matches your description, you'll receive an email notification.
-            You can then view the item and submit a claim if it's yours.
+            {t('myRequests.howMatchingWorksDesc') || "When someone reports a found item that matches your description, you'll receive an email notification. You can then view the item and submit a claim if it's yours."}
           </p>
         </div>
       </div>

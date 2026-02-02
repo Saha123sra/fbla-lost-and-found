@@ -106,7 +106,7 @@ Lost Dane Found provides a comprehensive digital platform that:
 | Authentication | JWT (JSON Web Tokens) with School ID verification |
 | AI/ML | Object Detection Model for item matching |
 | Chatbot | AI-powered conversational assistant |
-| Email | Resend (transactional emails) |
+| Email | Gmail/Nodemailer (transactional emails) |
 
 ### 4.2 Access Control Philosophy
 

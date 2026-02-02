@@ -1,13 +1,23 @@
-const { Resend } = require('resend');
+const nodemailer = require('nodemailer');
 
-// Initialize Resend client (skip if API key is "skip" or not provided)
-const apiKey = process.env.RESEND_API_KEY;
-const resend = (apiKey && apiKey !== 'skip')
-  ? new Resend(apiKey)
+// Gmail SMTP configuration
+const gmailUser = process.env.GMAIL_USER;
+const gmailAppPassword = process.env.GMAIL_APP_PASSWORD;
+
+// Create transporter (skip if credentials not provided)
+const transporter = (gmailUser && gmailAppPassword && gmailAppPassword !== 'skip')
+  ? nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: gmailUser,
+        pass: gmailAppPassword
+      }
+      
+    })
   : null;
 
-// Use Resend's test address for free tier, or your verified domain
-const FROM_EMAIL = process.env.FROM_EMAIL || 'Lost Dane Found <onboarding@resend.dev>';
+// From email address (uses Gmail account)
+const FROM_EMAIL = process.env.FROM_EMAIL || `Lost Dane Found <${gmailUser}>`;
 const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173';
 
 // Email templates
@@ -345,8 +355,8 @@ const sendEmail = async (to, templateName, templateData) => {
 
     const { subject, html } = template(...templateData);
 
-    // If Resend is not configured, log details for dev mode testing
-    if (!resend) {
+    // If Gmail is not configured, log details for dev mode testing
+    if (!transporter) {
       console.log(`\n========== [DEV MODE EMAIL] ==========`);
       console.log(`To: ${to}`);
       console.log(`Subject: ${subject}`);
@@ -359,21 +369,16 @@ const sendEmail = async (to, templateName, templateData) => {
       return { success: true, dev: true, templateData };
     }
 
-    // Send via Resend
-    const { data, error } = await resend.emails.send({
+    // Send via Gmail/Nodemailer
+    const info = await transporter.sendMail({
       from: FROM_EMAIL,
       to: to,
       subject: subject,
       html: html
     });
 
-    if (error) {
-      console.error('Resend error:', error);
-      return { success: false, error: error.message };
-    }
-
-    console.log(`Email sent to ${to}: ${subject}`);
-    return { success: true, id: data.id };
+    console.log(`Email sent to ${to}: ${subject} (ID: ${info.messageId})`);
+    return { success: true, id: info.messageId };
   } catch (error) {
     console.error('Send email error:', error);
     return { success: false, error: error.message };
@@ -385,24 +390,19 @@ const sendEmail = async (to, templateName, templateData) => {
  */
 const sendRawEmail = async (to, subject, html) => {
   try {
-    if (!resend) {
+    if (!transporter) {
       console.log(`[DEV] Raw email to: ${to}, Subject: ${subject}`);
       return { success: true, dev: true };
     }
 
-    const { data, error } = await resend.emails.send({
+    const info = await transporter.sendMail({
       from: FROM_EMAIL,
       to: to,
       subject: subject,
       html: html
     });
 
-    if (error) {
-      console.error('Resend error:', error);
-      return { success: false, error: error.message };
-    }
-
-    return { success: true, id: data.id };
+    return { success: true, id: info.messageId };
   } catch (error) {
     console.error('Send raw email error:', error);
     return { success: false, error: error.message };

@@ -69,7 +69,7 @@ const LanguageSwitcher = () => {
               key={lang.code}
               onClick={() => handleLanguageChange(lang.code)}
               className={`w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-gray-50 transition-colors first:rounded-t-lg last:rounded-b-lg ${
-                language === lang.code ? 'bg-navy/5 text-navy font-medium' : 'text-gray-700'
+                language === lang.code ? 'bg-carolina-100 font-medium' : ''
               }`}
               role="option"
               aria-selected={language === lang.code}
@@ -78,12 +78,16 @@ const LanguageSwitcher = () => {
                 {lang.flag}
               </span>
               <div className="flex flex-col">
-                <span className="text-sm">{lang.nativeName}</span>
-                <span className="text-xs text-gray-500">{lang.name}</span>
+                <span className={`text-sm ${language === lang.code ? 'text-navy-800' : 'text-gray-700'}`}>
+                  {lang.nativeName}
+                </span>
+                <span className={`text-xs ${language === lang.code ? 'text-navy-600' : 'text-gray-500'}`}>
+                  {lang.name}
+                </span>
               </div>
               {language === lang.code && (
                 <svg
-                  className="w-4 h-4 ml-auto text-navy"
+                  className="w-4 h-4 ml-auto text-navy-700"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"

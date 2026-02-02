@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { HelpCircle, ChevronDown, ChevronUp, Search } from 'lucide-react';
 import { faqAPI } from '../services/api';
+import { useLanguage } from '../context/LanguageContext';
 
 const FAQ = () => {
+  const { t } = useLanguage();
   const [faqs, setFaqs] = useState([]);
   const [groupedFaqs, setGroupedFaqs] = useState({});
   const [loading, setLoading] = useState(true);
@@ -69,8 +71,8 @@ const FAQ = () => {
           <div className="w-16 h-16 bg-carolina-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <HelpCircle className="w-8 h-8 text-navy-700" />
           </div>
-          <h1 className="text-3xl font-bold text-navy-800 mb-2">Frequently Asked Questions</h1>
-          <p className="text-gray-600">Find answers to common questions about Lost Dane Found</p>
+          <h1 className="text-3xl font-bold text-navy-800 mb-2">{t('faq.title')}</h1>
+          <p className="text-gray-600">{t('faq.subtitle')}</p>
         </div>
 
         {/* Search */}
@@ -78,7 +80,7 @@ const FAQ = () => {
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
           <input
             type="text"
-            placeholder="Search FAQs..."
+            placeholder={t('faq.searchPlaceholder')}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-navy-500 focus:border-navy-500 outline-none shadow-sm"
@@ -91,7 +93,7 @@ const FAQ = () => {
           <div className="bg-white rounded-xl shadow-md overflow-hidden">
             {filteredFaqs.length === 0 ? (
               <div className="p-8 text-center text-gray-500">
-                No results found for "{searchQuery}"
+                {t('faq.noResults')}
               </div>
             ) : (
               <div className="divide-y divide-gray-100">
@@ -158,15 +160,15 @@ const FAQ = () => {
 
         {/* Contact */}
         <div className="mt-8 bg-navy-50 border border-navy-200 rounded-xl p-6 text-center">
-          <h3 className="font-bold text-navy-800 mb-2">Still have questions?</h3>
+          <h3 className="font-bold text-navy-800 mb-2">{t('faq.stillNeedHelp')}</h3>
           <p className="text-navy-600 mb-4">
-            Contact us at{' '}
+            {t('faq.contactUs')}{' '}
             <a href="mailto:lostdanefound@forsyth.k12.ga.us" className="underline">
               lostdanefound@forsyth.k12.ga.us
             </a>
           </p>
           <p className="text-sm text-navy-500">
-            Or visit the Main Office during school hours
+            {t('faq.visitOffice') || 'Or visit the Main Office during school hours'}
           </p>
         </div>
       </div>

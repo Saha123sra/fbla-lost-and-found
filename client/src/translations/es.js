@@ -28,16 +28,26 @@ export default {
     stats: {
       itemsFound: "Objetos Encontrados",
       itemsReturned: "Objetos Devueltos",
-      activeUsers: "Usuarios Activos"
+      activeUsers: "Usuarios Activos",
+      returnRate: "Tasa de Devolucion",
+      avgReturnTime: "Tiempo Promedio"
     },
     howItWorks: {
       title: "Como Funciona",
+      subtitle: "Nuestro simple proceso de 3 pasos hace que encontrar objetos perdidos sea mas facil que nunca",
       step1Title: "Reportar o Buscar",
       step1Desc: "Encontraste algo? Reportalo. Perdiste algo? Busca en nuestra base de datos o pre-registra tu objeto.",
       step2Title: "Emparejamiento",
       step2Desc: "Nuestro sistema empareja automaticamente objetos encontrados con solicitudes de objetos perdidos y te notifica.",
       step3Title: "Reclamar y Recoger",
       step3Desc: "Verifica la propiedad, obtiene aprobacion y recoge tu objeto en la oficina principal."
+    },
+    testimonials: {
+      title: "Lo Que Dicen Los Danes"
+    },
+    cta: {
+      title: "Encontraste Algo?",
+      subtitle: "Ayuda a un companero Dane reportandolo. Solo toma un minuto!"
     }
   },
 
@@ -70,7 +80,13 @@ export default {
     },
     noItems: "No se encontraron objetos",
     claim: "Reclamar",
-    viewDetails: "Ver Detalles"
+    viewDetails: "Ver Detalles",
+    tryAdjusting: "Intenta ajustar tu busqueda o filtros",
+    clearFilters: "Limpiar todos los filtros",
+    clearAll: "Limpiar todo",
+    uncategorized: "Sin categoria",
+    page: "Pagina",
+    of: "de"
   },
 
   // Report page
@@ -133,6 +149,8 @@ export default {
   claims: {
     title: "Mis Reclamos",
     noClaims: "Aun no has hecho ningun reclamo",
+    claimedOn: "Reclamado el",
+    reason: "Razon",
     status: {
       pending: "Pendiente",
       approved: "Aprobado",
@@ -169,9 +187,12 @@ export default {
     login: "Iniciar Sesion",
     register: "Registrarse",
     studentId: "ID de Estudiante",
+    adminId: "ID de Admin",
     email: "Correo Electronico",
     password: "Contrasena",
     confirmPassword: "Confirmar Contrasena",
+    passwordPlaceholder: "Al menos 6 caracteres",
+    confirmPasswordPlaceholder: "Vuelve a ingresar tu contrasena",
     firstName: "Nombre",
     lastName: "Apellido",
     gradeLevel: "Grado",
@@ -180,7 +201,15 @@ export default {
     hasAccount: "Ya tienes una cuenta?",
     adminLogin: "Inicio de Admin",
     ownerLogin: "Inicio de Propietario",
-    adminCode: "Codigo de Admin de 6 Digitos"
+    adminCode: "Codigo de Admin de 6 Digitos",
+    siteOwner: "Propietario del Sitio",
+    studentLogin: "Inicio de Estudiante",
+    enterPassword: "Ingresa tu contrasena",
+    enterAdminId: "Ingresa tu ID de admin",
+    enterStudentId: "Ingresa tu ID de estudiante",
+    createAccount: "Crear Cuenta",
+    registerAsAdmin: "Registrarse como Admin",
+    select: "Seleccionar..."
   },
 
   // Footer
@@ -197,6 +226,248 @@ export default {
     en: "Ingles",
     es: "Espanol",
     hi: "Hindi",
-    fr: "Frances"
+    fr: "Frances",
+    zh: "Mandarin"
+  },
+
+  // Admin Dashboard
+  admin: {
+    title: "Panel de Administrador",
+    stats: {
+      activeItems: "Objetos Activos",
+      pendingClaims: "Reclamos Pendientes",
+      returnedItems: "Objetos Devueltos",
+      successRate: "Tasa de Exito"
+    },
+    tabs: {
+      overview: "Resumen",
+      claims: "Reclamos",
+      items: "Objetos",
+      students: "Estudiantes"
+    },
+    overview: {
+      welcome: "Bienvenido, Administrador!",
+      pendingReview: "Tienes {count} reclamos pendientes por revisar.",
+      reviewClaims: "Revisar Reclamos"
+    },
+    claims: {
+      title: "Reclamos Pendientes",
+      noPending: "No hay reclamos pendientes! Todo al dia.",
+      claimedBy: "Reclamado por",
+      studentId: "ID de Estudiante",
+      proofOfOwnership: "Prueba de Propiedad",
+      approve: "Aprobar",
+      deny: "Denegar",
+      approveClaim: "Aprobar Reclamo",
+      denyClaim: "Denegar Reclamo",
+      pickupDate: "Fecha de Recogida",
+      pickupTime: "Hora de Recogida",
+      pickupLocation: "Lugar de Recogida",
+      denialReason: "Razon de Denegacion",
+      denialPlaceholder: "Prueba insuficiente, la descripcion no coincide...",
+      confirm: "Confirmar",
+      actionSuccess: "Reclamo {status}!",
+      loadError: "Error al cargar reclamos",
+      actionError: "Accion fallida"
+    },
+    students: {
+      title: "Directorio de Estudiantes",
+      searchPlaceholder: "Buscar estudiantes...",
+      noMatch: "Ningun estudiante coincide con tu busqueda",
+      noStudents: "Aun no hay estudiantes registrados",
+      loadingStudents: "Cargando estudiantes...",
+      loadError: "Error al cargar estudiantes",
+      columns: {
+        name: "Nombre",
+        studentId: "ID Estudiante",
+        email: "Correo",
+        grade: "Grado",
+        claims: "Reclamos",
+        itemsReported: "Objetos Reportados",
+        joined: "Registro"
+      }
+    },
+    items: {
+      comingSoon: "Gestion de objetos proximamente..."
+    }
+  },
+
+  // Owner Dashboard
+  owner: {
+    title: "Panel del Propietario del Sitio",
+    siteAdmin: "Administracion del Sitio",
+    adminId: "ID de Admin",
+    lastLogin: "Ultimo Acceso",
+    actions: "Acciones",
+    never: "Nunca",
+    stats: {
+      pendingAdmins: "Admins Pendientes",
+      activeAdmins: "Admins Activos"
+    },
+    tabs: {
+      pendingAdmins: "Admins Pendientes",
+      allAdmins: "Todos los Admins",
+      settings: "Configuracion"
+    },
+    pendingAdmins: {
+      title: "Solicitudes de Admin Pendientes",
+      noPending: "No hay solicitudes de admin pendientes",
+      approve: "Aprobar",
+      deny: "Denegar",
+      requestedOn: "Solicitado el"
+    },
+    allAdmins: {
+      title: "Todos los Administradores",
+      active: "Activo",
+      deactivated: "Desactivado",
+      reactivate: "Reactivar",
+      deactivate: "Desactivar",
+      regenerateCode: "Regenerar Codigo",
+      noAdmins: "No se encontraron administradores"
+    },
+    denyModal: {
+      title: "Denegar Registro de Admin",
+      denyingFor: "Denegando registro para",
+      reasonLabel: "Razon",
+      reasonPlaceholder: "Ingrese razon de denegacion...",
+      denyButton: "Denegar Registro"
+    }
+  },
+
+  // Item Detail page
+  itemDetail: {
+    category: "Categoria",
+    location: "Ubicacion",
+    dateFound: "Fecha Encontrado",
+    reportedBy: "Reportado por",
+    description: "Descripcion",
+    status: "Estado",
+    claimItem: "Reclamar Este Objeto",
+    backToBrowse: "Volver a Explorar",
+    notFound: "Objeto no encontrado",
+    alreadyClaimed: "Este objeto ya ha sido reclamado",
+    pendingClaim: "Este objeto tiene un reclamo pendiente"
+  },
+
+  // Claim form
+  claimForm: {
+    title: "Reclamar Este Objeto",
+    subtitle: "Por favor proporciona prueba de propiedad",
+    proofLabel: "Describe como puedes probar que es tuyo",
+    proofPlaceholder: "Describe caracteristicas unicas, marcas o contenido que solo el dueno conoceria. Se especifico - esto nos ayuda a verificar tu propiedad.",
+    proofHelp: "Incluye detalles como: rasgunos especificos, calcomanias, contenido, numeros de serie, o cualquier caracteristica unica.",
+    contactEmail: "Correo de Contacto",
+    contactPhone: "Telefono de Contacto (Opcional)",
+    confirmationSentTo: "La confirmacion sera enviada a:",
+    importantLabel: "Importante",
+    disclaimer: "Al enviar este reclamo, confirmas que este objeto te pertenece. Reclamos falsos pueden resultar en accion disciplinaria.",
+    submit: "Enviar Reclamo",
+    success: {
+      title: "Reclamo Enviado!",
+      message: "Tu reclamo ha sido enviado y esta pendiente de revision. Recibiras un correo una vez procesado.",
+      viewClaims: "Ver Mis Reclamos"
+    }
+  },
+
+  // FAQ page
+  faq: {
+    title: "Preguntas Frecuentes",
+    subtitle: "Encuentra respuestas a preguntas comunes sobre Lost Dane Found",
+    searchPlaceholder: "Buscar preguntas...",
+    categories: {
+      general: "General",
+      reporting: "Reportar Objetos",
+      claiming: "Reclamar Objetos",
+      account: "Cuenta"
+    },
+    noResults: "Ninguna pregunta coincide con tu busqueda",
+    stillNeedHelp: "Aun necesitas ayuda?",
+    contactUs: "Contacta la oficina principal",
+    visitOffice: "O visita la Oficina Principal durante el horario escolar"
+  },
+
+  // OTP / Verification
+  otp: {
+    title: "Ingresa el Codigo de Verificacion",
+    subtitle: "Hemos enviado un codigo de 6 digitos a tu correo",
+    placeholder: "Ingresa codigo de 6 digitos",
+    submit: "Verificar",
+    resend: "Reenviar Codigo",
+    resendIn: "Reenviar codigo en {seconds}s",
+    invalid: "Codigo invalido. Por favor intenta de nuevo.",
+    expired: "Codigo expirado. Por favor solicita uno nuevo."
+  },
+
+  // Password Reset
+  resetPassword: {
+    forgotTitle: "Olvidaste tu Contrasena",
+    forgotSubtitle: "Ingresa tu correo y te enviaremos un enlace de restablecimiento",
+    sendLink: "Enviar Enlace",
+    linkSent: "Enlace enviado! Revisa tu correo.",
+    resetTitle: "Restablecer tu Contrasena",
+    newPassword: "Nueva Contrasena",
+    confirmNewPassword: "Confirmar Nueva Contrasena",
+    resetButton: "Restablecer Contrasena",
+    success: "Contrasena restablecida exitosamente! Ya puedes iniciar sesion."
+  },
+
+  // My Requests page
+  myRequests: {
+    title: "Mis Solicitudes de Objetos Perdidos",
+    subtitle: "Rastrea objetos que has pre-registrado como perdidos",
+    noRequests: "Aun no has enviado solicitudes de objetos perdidos",
+    noRequestsDesc: "Pre-registra objetos perdidos para recibir notificaciones cuando sean encontrados",
+    createNew: "Reportar un Objeto Perdido",
+    newRequest: "Nueva Solicitud",
+    viewMatch: "Ver Coincidencia",
+    howMatchingWorks: "Como funciona el emparejamiento",
+    howMatchingWorksDesc: "Nuestro sistema compara automaticamente la descripcion de tu objeto perdido con los objetos encontrados reportados recientemente. Cuando hay una posible coincidencia, recibiras una notificacion por correo electronico.",
+    status: {
+      active: "Activo",
+      matched: "Emparejado",
+      cancelled: "Cancelado",
+      expired: "Expirado"
+    },
+    dateLost: "Fecha Perdido",
+    cancel: "Cancelar Solicitud"
+  },
+
+  // ChatBot
+  chatbot: {
+    title: "Asistente Lost Dane Found",
+    alwaysAvailable: "Siempre disponible",
+    typing: "El asistente esta escribiendo...",
+    placeholder: "Preguntame lo que sea...",
+    suggestionsLabel: "Preguntas rapidas",
+    greeting: "Hola! Estoy aqui para ayudarte con Lost Dane Found. Como puedo asistirte hoy?",
+    suggestions: [
+      "Como reporto un objeto encontrado?",
+      "Como reclamo un objeto?",
+      "Donde esta el area de objetos perdidos?",
+      "Cuanto tiempo se guardan los objetos?"
+    ],
+    responses: {
+      greeting: "Hola! 👋 Estas buscando un objeto perdido o quieres reportar algo que encontraste?",
+      search: "Para buscar objetos:\n\n1️⃣ Ve a Ver Objetos en el menu\n2️⃣ Usa los filtros (categoria, fecha, ubicacion)\n3️⃣ Encontraste una coincidencia? Envia un reclamo!",
+      lost: "Lamento escuchar eso! 😟\n\nEsto es lo que debes hacer:\n\n1️⃣ Revisa Ver Objetos para ver si ha sido encontrado\n2️⃣ Envia una Solicitud de Objeto Perdido para que te notifiquemos si aparece",
+      found: "Gracias por ayudar! 🐕\n\nVe a Reportar Encontrado en el menu, sube una foto y agrega detalles. Nosotros nos encargamos del resto!",
+      claim: "Proceso de reclamo:\n\n1️⃣ Encuentra tu objeto en Ver Objetos\n2️⃣ Haz clic en 'Reclamar' y proporciona prueba de propiedad\n3️⃣ El admin revisa en 24 horas\n4️⃣ Recibe instrucciones de recogida por correo\n5️⃣ Trae tu ID de estudiante para recogerlo",
+      location: "📍 Oficina de Objetos Perdidos\nOficina Principal, Salon 101\n\n🕐 Horario\nLunes - Viernes: 7:30 AM – 4:00 PM",
+      howItWorks: "Asi funciona Lost Dane Found:\n\n🔍 Perdiste algo?\nExplora objetos o envia una solicitud de objeto perdido\n\n📦 Encontraste algo?\nReportalo para que el dueno pueda encontrarlo\n\n✅ Reclamos\nEnvia prueba, verifica y recoge!",
+      thanks: "De nada! 🎉 Avisame si necesitas algo mas.",
+      default: "Puedo ayudarte con:\n\n🔍 Buscar objetos perdidos\n📦 Reportar objetos encontrados\n✅ Proceso de reclamo\n📍 Ubicacion y horario de la oficina\n\nQue te gustaria saber?"
+    }
+  },
+
+  // Toasts / Notifications
+  toast: {
+    success: "Exito!",
+    error: "Error",
+    claimSubmitted: "Reclamo enviado exitosamente",
+    itemReported: "Objeto reportado exitosamente",
+    requestSubmitted: "Solicitud enviada exitosamente",
+    loginSuccess: "Sesion iniciada exitosamente",
+    logoutSuccess: "Sesion cerrada exitosamente",
+    profileUpdated: "Perfil actualizado exitosamente"
   }
 };

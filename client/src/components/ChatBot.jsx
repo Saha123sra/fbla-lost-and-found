@@ -1,18 +1,42 @@
 // src/components/ChatBot.jsx
 import React, { useState, useRef, useEffect } from 'react';
-import { MessageCircle, Send, Bot, X } from 'lucide-react';
+import { MessageCircle, Send, Bot, X, ChevronUp, ChevronDown } from 'lucide-react';
+import { useLanguage } from '../context/LanguageContext';
 
 const FloatingChatbot = () => {
+  const { t, language } = useLanguage();
   const [isOpen, setIsOpen] = useState(false);
-  const [messages, setMessages] = useState([
-    {
-      role: 'bot',
-      text: "Hi there! 👋 I'm the Lost Dane Found Assistant.\n\n• Search for lost items\n• Report found items\n• Understand the claim process\n• Answer FAQs\n\nHow can I help you today?"
-    }
-  ]);
+  const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
+  const [showSuggestions, setShowSuggestions] = useState(true);
   const messagesEndRef = useRef(null);
+  const [initialized, setInitialized] = useState(false);
+
+  // Initialize greeting message with translations
+  useEffect(() => {
+    if (!initialized) {
+      setMessages([
+        {
+          role: 'bot',
+          text: t('chatbot.greeting')
+        }
+      ]);
+      setInitialized(true);
+    }
+  }, [t, initialized]);
+
+  // Update greeting when language changes
+  useEffect(() => {
+    if (initialized && messages.length === 1 && messages[0].role === 'bot') {
+      setMessages([
+        {
+          role: 'bot',
+          text: t('chatbot.greeting')
+        }
+      ]);
+    }
+  }, [language]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -22,51 +46,57 @@ const FloatingChatbot = () => {
     scrollToBottom();
   }, [messages, isTyping]);
 
+  // Multilingual bot responses
   const getBotResponse = (userMessage) => {
     const lower = userMessage.toLowerCase();
 
-    // Greetings
-    if (lower.match(/^(hi|hello|hey|good morning|good afternoon)/)) {
-      return "Hello! 👋 Are you looking for a lost item or reporting something you found?";
-    }
+    // Get response key based on user message pattern
+    const getResponseKey = () => {
+      // Greetings
+      if (lower.match(/^(hi|hello|hey|good morning|good afternoon|hola|bonjour|नमस्ते|你好)/)) {
+        return 'greeting';
+      }
 
-    // User is SEARCHING for items (asking if something exists, looking for something)
-    if (lower.match(/are there|is there|any .*(found|available|lost)|looking for|search|browse|find my|where.*(my|is)|have you seen/)) {
-      return "To search for items:\n\n1️⃣ Go to **Browse Items**\n2️⃣ Use filters (category, date, location)\n3️⃣ Found a match? Submit a claim!\n\n🔗 [Browse Items](/browse)";
-    }
+      // User is SEARCHING for items
+      if (lower.match(/are there|is there|any .*(found|available|lost)|looking for|search|browse|find my|where.*(my|is)|have you seen|buscar|chercher|खोज|搜索/)) {
+        return 'search';
+      }
 
-    // User LOST something
-    if (lower.includes('i lost') || lower.includes("i've lost") || lower.includes('lost my') || lower.includes('missing')) {
-      return "Sorry to hear that! 😟\n\nHere's what to do:\n\n1️⃣ **Browse Items** to see if it's been found\n2️⃣ **Submit a Lost Item Request** so we can notify you if it turns up\n\n🔗 [Browse Items](/browse)\n🔗 [Report Lost Item](/request)";
-    }
+      // User LOST something
+      if (lower.match(/i lost|i've lost|lost my|missing|perdi|perdido|j'ai perdu|खो गया|丢失/)) {
+        return 'lost';
+      }
 
-    // User FOUND something and wants to report it
-    if (lower.match(/i found|found a|found an|report.*(found|item)|turn in|submit.*found|want to report/)) {
-      return "Thanks for helping! 🐕\n\nGo to **Report Found Item**, upload a photo, and add details. We'll handle the rest!\n\n🔗 [Report Found Item](/report)";
-    }
+      // User FOUND something
+      if (lower.match(/i found|found a|found an|report.*(found|item)|turn in|submit.*found|want to report|encontré|j'ai trouvé|मिला|找到/)) {
+        return 'found';
+      }
 
-    // Claim process questions
-    if (lower.includes('claim') || lower.includes('how do i get') || lower.includes('pick up') || lower.includes('retrieve')) {
-      return "Claim process:\n\n1️⃣ Find your item in Browse Items\n2️⃣ Click 'Claim' and provide proof of ownership\n3️⃣ Admin reviews within 24 hours\n4️⃣ Get pickup instructions by email\n5️⃣ Bring your student ID to collect\n\n🔗 [My Claims](/my-claims)";
-    }
+      // Claim process
+      if (lower.match(/claim|how do i get|pick up|retrieve|reclamar|réclamer|दावा|认领/)) {
+        return 'claim';
+      }
 
-    // Location questions
-    if (lower.includes('where') || lower.includes('location') || lower.includes('office') || lower.includes('hours')) {
-      return "📍 **Lost & Found Office**\nMain Office, Room 101\n\n🕐 **Hours**\nMonday - Friday: 7:30 AM – 4:00 PM";
-    }
+      // Location questions
+      if (lower.match(/where|location|office|hours|donde|où|कहां|哪里|horario|heures/)) {
+        return 'location';
+      }
 
-    // How does it work
-    if (lower.includes('how') && (lower.includes('work') || lower.includes('use'))) {
-      return "Here's how Lost Dane Found works:\n\n🔍 **Lost something?**\nBrowse items or submit a lost item request\n\n📦 **Found something?**\nReport it so the owner can find it\n\n✅ **Claiming**\nSubmit proof, get verified, pick up!";
-    }
+      // How does it work
+      if (lower.match(/how.*(work|use)|como funciona|comment ça marche|कैसे काम|怎么用/)) {
+        return 'howItWorks';
+      }
 
-    // Thanks
-    if (lower.match(/thank|thanks|thx/)) {
-      return "You're welcome! 🎉 Let me know if you need anything else.";
-    }
+      // Thanks
+      if (lower.match(/thank|thanks|thx|gracias|merci|धन्यवाद|谢谢/)) {
+        return 'thanks';
+      }
 
-    // Default fallback
-    return "I can help with:\n\n🔍 Searching for lost items\n📦 Reporting found items\n✅ Claim process\n📍 Office location & hours\n\nWhat would you like to know?";
+      return 'default';
+    };
+
+    const responseKey = getResponseKey();
+    return t(`chatbot.responses.${responseKey}`);
   };
 
   const handleSend = () => {
@@ -76,6 +106,7 @@ const FloatingChatbot = () => {
     setMessages(prev => [...prev, { role: 'user', text: userMessage }]);
     setInput('');
     setIsTyping(true);
+    setShowSuggestions(false); // Hide suggestions after first message
 
     setTimeout(() => {
       const response = getBotResponse(userMessage);
@@ -84,7 +115,8 @@ const FloatingChatbot = () => {
     }, 800);
   };
 
-  const quickReplies = [
+  // Get quick replies from translations
+  const quickReplies = t('chatbot.suggestions') || [
     "I lost something",
     "I found something",
     "How does this work?",
@@ -98,14 +130,15 @@ const FloatingChatbot = () => {
         <div
           className="fixed bottom-24 right-4 sm:right-6 z-50
                      w-[90vw] sm:w-[360px] md:w-[380px] lg:w-[400px]
-                     h-[60vh] sm:h-[380px] md:h-[400px] lg:h-[450px]"
+                     h-[60vh] sm:h-[380px] md:h-[400px] lg:h-[450px]
+                     max-h-[calc(100vh-120px)]"
         >
-          <div className="relative bg-white rounded-2xl shadow-xl flex flex-col overflow-hidden">
-            
+          <div className="relative bg-white rounded-2xl shadow-xl flex flex-col overflow-hidden h-full">
+
             {/* Close Button */}
             <button
               onClick={() => setIsOpen(false)}
-              className="absolute top-3 right-3 text-gray-500 hover:text-gray-800 focus:outline-none focus:ring-2 focus:ring-sky-400 rounded-full"
+              className="absolute top-3 right-3 text-gray-500 hover:text-gray-800 focus:outline-none focus:ring-2 focus:ring-sky-400 rounded-full z-10"
             >
               <X size={18} />
             </button>
@@ -116,21 +149,21 @@ const FloatingChatbot = () => {
                 <Bot className="w-5 h-5 text-navy-800" />
               </div>
               <div>
-                <h2 className="font-bold text-sm">Lost Dane Found Assistant</h2>
-                <p className="text-xs text-skyblue-200">Always available</p>
+                <h2 className="font-bold text-sm">{t('chatbot.title')}</h2>
+                <p className="text-xs text-skyblue-200">{t('chatbot.alwaysAvailable')}</p>
               </div>
             </div>
 
             {/* Messages */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-4">
+            <div className="flex-1 overflow-y-auto px-4 py-5 space-y-4">
               {messages.map((msg, i) => (
                 <div
                   key={i}
                   className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
                 >
-                  <div className="max-w-[80%]">
+                  <div className="max-w-[85%]">
                     <div
-                      className={`px-4 py-3 rounded-2xl whitespace-pre-line break-words
+                      className={`px-4 py-3 rounded-2xl whitespace-pre-line break-words text-sm leading-relaxed
                         ${msg.role === 'user'
                           ? 'bg-navy-600 text-white rounded-tr-none'
                           : 'bg-gray-100 text-gray-800 rounded-tl-none'}`
@@ -143,39 +176,54 @@ const FloatingChatbot = () => {
               ))}
 
               {isTyping && (
-                <div className="text-sm text-gray-400">Assistant is typing…</div>
+                <div className="text-sm text-gray-400 py-2">{t('chatbot.typing')}</div>
               )}
 
               <div ref={messagesEndRef} />
             </div>
 
-            {/* Quick Replies */}
-            <div className="px-4 pb-2 flex flex-wrap gap-2 overflow-x-auto">
-              {quickReplies.map((reply, i) => (
-                <button
-                  key={i}
-                  onClick={() => setInput(reply)}
-                  className="text-xs px-3 py-1.5 bg-gray-100 hover:bg-gray-200 rounded-full flex-shrink-0 focus:outline-none focus:ring-2 focus:ring-sky-400"
-                >
-                  {reply}
-                </button>
-              ))}
+            {/* Collapsible Quick Replies */}
+            <div className="border-t border-gray-100">
+              <button
+                onClick={() => setShowSuggestions(!showSuggestions)}
+                className="w-full px-4 py-2 flex items-center justify-between text-xs text-gray-500 hover:bg-gray-50 transition"
+              >
+                <span>{t('chatbot.suggestionsLabel')}</span>
+                {showSuggestions ? <ChevronDown size={16} /> : <ChevronUp size={16} />}
+              </button>
+
+              {showSuggestions && (
+                <div className="px-4 pb-3 flex flex-wrap gap-2">
+                  {quickReplies.map((reply, i) => (
+                    <button
+                      key={i}
+                      onClick={() => {
+                        setInput(reply);
+                        setShowSuggestions(false);
+                      }}
+                      className="text-xs px-3 py-2 bg-gray-100 hover:bg-gray-200 rounded-full flex-shrink-0 focus:outline-none focus:ring-2 focus:ring-sky-400 transition"
+                    >
+                      {reply}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
 
             {/* Input */}
-            <div className="border-t p-3 flex gap-2">
+            <div className="border-t border-gray-200 p-4 flex gap-3">
               <input
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSend()}
-                placeholder="Type a message…"
-                className="flex-1 px-4 py-2 border rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-sky-400"
+                placeholder={t('chatbot.placeholder')}
+                className="flex-1 px-4 py-2.5 border border-gray-200 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-navy-500 focus:border-transparent"
               />
               <button
                 onClick={handleSend}
-                className="bg-navy-600 text-white p-3 rounded-full hover:bg-navy-700 focus:outline-none focus:ring-2 focus:ring-sky-400"
+                className="bg-navy-600 text-white p-2.5 rounded-full hover:bg-navy-700 focus:outline-none focus:ring-2 focus:ring-navy-500 transition"
               >
-                <Send size={16} />
+                <Send size={18} />
               </button>
             </div>
           </div>

@@ -203,7 +203,14 @@ router.patch('/:id', authenticate, requireAdmin, async (req, res) => {
     }
     
     const claim = claimResult.rows[0];
-    
+
+    // Convert empty strings to null for database fields
+    const pickupDateValue = pickupDate && pickupDate.trim() !== '' ? pickupDate : null;
+    const pickupTimeValue = pickupTime && pickupTime.trim() !== '' ? pickupTime : null;
+    const pickupLocationValue = pickupLocation && pickupLocation.trim() !== '' ? pickupLocation : null;
+    const denialReasonValue = denialReason && denialReason.trim() !== '' ? denialReason : null;
+    const reviewNotesValue = reviewNotes && reviewNotes.trim() !== '' ? reviewNotes : null;
+
     // Update claim using transaction
     const updatedClaim = await transaction(async (client) => {
       // Update the claim
@@ -220,7 +227,7 @@ router.patch('/:id', authenticate, requireAdmin, async (req, res) => {
           updated_at = NOW()
          WHERE id = $8
          RETURNING *`,
-        [status, req.user.id, reviewNotes, denialReason, pickupDate, pickupTime, pickupLocation, req.params.id]
+        [status, req.user.id, reviewNotesValue, denialReasonValue, pickupDateValue, pickupTimeValue, pickupLocationValue, req.params.id]
       );
       
       // Update item status based on claim status

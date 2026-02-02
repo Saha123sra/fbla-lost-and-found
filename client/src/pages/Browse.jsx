@@ -23,7 +23,7 @@ const ItemImage = ({ src, alt }) => {
 };
 
 const Browse = () => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [items, setItems] = useState([]);
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -118,9 +118,9 @@ const Browse = () => {
       claimed: 'bg-gray-100 text-gray-700'
     };
     const labels = {
-      available: 'Available',
-      pending: 'Pending Claim',
-      claimed: 'Claimed'
+      available: t('browse.filter.available'),
+      pending: t('browse.filter.pendingClaim'),
+      claimed: t('browse.filter.claimed')
     };
     return (
       <span className={`px-2 py-1 rounded-full text-xs font-medium ${styles[itemStatus] || styles.available}`}>
@@ -130,15 +130,15 @@ const Browse = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8 transition-colors">
       <div className="max-w-7xl mx-auto px-4">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">{t('browse.title')}</h1>
-          <p className="text-gray-600 mt-2">{t('browse.subtitle')}</p>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">{t('browse.title')}</h1>
+          <p className="text-gray-600 dark:text-gray-400 mt-2">{t('browse.subtitle')}</p>
         </div>
 
         {/* Filters */}
-        <div className="bg-white p-6 rounded-xl shadow-md mb-8">
+        <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md mb-8 transition-colors">
           <div className="flex flex-col lg:flex-row gap-4">
             {/* Search */}
             <div className="flex-1 relative">
@@ -148,7 +148,7 @@ const Browse = () => {
                 placeholder={t('browse.search')}
                 value={search}
                 onChange={e => { setSearch(e.target.value); setPagination(p => ({ ...p, page: 1 })); }}
-                className="w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-navy-500 outline-none"
+                className="w-full pl-10 pr-4 py-3 border dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-navy-500 outline-none bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400"
               />
             </div>
 
@@ -158,7 +158,7 @@ const Browse = () => {
               <select
                 value={category}
                 onChange={e => { setCategory(e.target.value); setPagination(p => ({ ...p, page: 1 })); }}
-                className={`px-4 py-3 border rounded-lg focus:ring-2 focus:ring-navy-500 outline-none min-w-[150px] ${!category ? 'text-gray-400 italic' : 'text-gray-800'}`}
+                className={`px-4 py-3 border dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-navy-500 outline-none min-w-[150px] bg-white dark:bg-gray-700 ${!category ? 'text-gray-400 italic' : 'text-gray-800 dark:text-white'}`}
               >
                 <option value="" disabled hidden>
                   {t('browse.filter.category')}
@@ -174,7 +174,7 @@ const Browse = () => {
             <select
               value={duration}
               onChange={e => { setDuration(e.target.value); setPagination(p => ({ ...p, page: 1 })); }}
-              className={`px-4 py-3 border rounded-lg focus:ring-2 focus:ring-navy-500 outline-none ${!duration ? 'text-gray-400 italic' : 'text-gray-800'}`}
+              className={`px-4 py-3 border dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-navy-500 outline-none bg-white dark:bg-gray-700 ${!duration ? 'text-gray-400 italic' : 'text-gray-800 dark:text-white'}`}
             >
               <option value="" disabled hidden>
                 {t('browse.filter.duration', 'Duration')}
@@ -190,7 +190,7 @@ const Browse = () => {
             <select
               value={priority}
               onChange={e => { setPriority(e.target.value); setPagination(p => ({ ...p, page: 1 })); }}
-              className={`px-4 py-3 border rounded-lg focus:ring-2 focus:ring-navy-500 outline-none ${!priority ? 'text-gray-400 italic' : 'text-gray-800'}`}
+              className={`px-4 py-3 border dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-navy-500 outline-none bg-white dark:bg-gray-700 ${!priority ? 'text-gray-400 italic' : 'text-gray-800 dark:text-white'}`}
             >
               <option value="" disabled hidden>
                 {t('browse.filter.priority', 'Priority')}
@@ -204,7 +204,7 @@ const Browse = () => {
             <select
               value={status}
               onChange={e => { setStatus(e.target.value); setPagination(p => ({ ...p, page: 1 })); }}
-              className={`px-4 py-3 border rounded-lg focus:ring-2 focus:ring-navy-500 outline-none ${!status ? 'text-gray-400 italic' : 'text-gray-800'}`}
+              className={`px-4 py-3 border dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-navy-500 outline-none bg-white dark:bg-gray-700 ${!status ? 'text-gray-400 italic' : 'text-gray-800 dark:text-white'}`}
             >
               <option value="" disabled hidden>
                 {t('browse.filter.availability', 'Availability')}
@@ -219,39 +219,39 @@ const Browse = () => {
 
           {/* Active Filters */}
           {(search || category || duration || priority || status) && (
-            <div className="flex flex-wrap items-center gap-2 mt-4 pt-4 border-t">
+            <div className="flex flex-wrap items-center gap-2 mt-4 pt-4 border-t dark:border-gray-600">
               {search && (
-                <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full flex items-center gap-1 text-sm">
-                  Search: {search}
+                <span className="px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 rounded-full flex items-center gap-1 text-sm">
+                  {t('browse.search')}: {search}
                   <button onClick={() => setSearch('')}><X className="w-3 h-3"/></button>
                 </span>
               )}
               {category && (
-                <span className="px-3 py-1 bg-purple-100 text-purple-800 rounded-full flex items-center gap-1 text-sm">
-                  Category: {categories.find(c => c.id == category)?.name}
+                <span className="px-3 py-1 bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-300 rounded-full flex items-center gap-1 text-sm">
+                  {t('browse.filter.category')}: {categories.find(c => c.id == category)?.name}
                   <button onClick={() => setCategory('')}><X className="w-3 h-3"/></button>
                 </span>
               )}
               {duration && (
-                <span className="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full flex items-center gap-1 text-sm">
-                  Duration: {duration}
+                <span className="px-3 py-1 bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300 rounded-full flex items-center gap-1 text-sm">
+                  {t('browse.filter.duration')}: {duration}
                   <button onClick={() => setDuration('')}><X className="w-3 h-3"/></button>
                 </span>
               )}
               {priority && (
-                <span className="px-3 py-1 bg-red-100 text-red-800 rounded-full flex items-center gap-1 text-sm">
-                  Priority: {priority}
+                <span className="px-3 py-1 bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300 rounded-full flex items-center gap-1 text-sm">
+                  {t('browse.filter.priority')}: {priority}
                   <button onClick={() => setPriority('')}><X className="w-3 h-3"/></button>
                 </span>
               )}
               {status && (
-                <span className="px-3 py-1 bg-green-100 text-green-800 rounded-full flex items-center gap-1 text-sm">
-                  Status: {status}
+                <span className="px-3 py-1 bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 rounded-full flex items-center gap-1 text-sm">
+                  {t('itemDetail.status')}: {status}
                   <button onClick={() => setStatus('')}><X className="w-3 h-3"/></button>
                 </span>
               )}
-              <button onClick={resetFilters} className="text-sm text-red-600 hover:underline ml-2">
-                Clear all
+              <button onClick={resetFilters} className="text-sm text-red-600 dark:text-red-400 hover:underline ml-2">
+                {t('browse.clearAll') || 'Clear all'}
               </button>
             </div>
           )}
@@ -268,27 +268,27 @@ const Browse = () => {
               <Link
                 key={item.id}
                 to={`/items/${item.id}`}
-                className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition group"
+                className="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden hover:shadow-lg transition group"
               >
-                <div className="h-48 bg-gray-200 flex items-center justify-center relative">
+                <div className="h-48 bg-gray-200 dark:bg-gray-700 flex items-center justify-center relative">
                   <ItemImage src={item.image_url} alt={item.name} />
                   <div className="absolute top-3 right-3">
                     {getStatusBadge(item.status)}
                   </div>
                   {item.priority === 'high' && (
                     <span className="absolute top-3 left-3 bg-red-500 text-white px-2 py-1 rounded-full text-xs font-medium">
-                      High Priority
+                      {t('browse.filter.highPriority')}
                     </span>
                   )}
                 </div>
                 <div className="p-4">
-                  <h3 className="font-bold text-lg group-hover:text-navy-600 transition line-clamp-1">
+                  <h3 className="font-bold text-lg text-gray-900 dark:text-white group-hover:text-navy-600 dark:group-hover:text-carolina-400 transition line-clamp-1">
                     {item.name}
                   </h3>
-                  <p className="text-gray-600 text-sm mt-1 line-clamp-2">{item.description}</p>
-                  <div className="flex items-center justify-between mt-3 text-xs text-gray-500">
-                    <span>{item.category_name || 'Uncategorized'}</span>
-                    <span>{new Date(item.found_date).toLocaleDateString()}</span>
+                  <p className="text-gray-600 dark:text-gray-400 text-sm mt-1 line-clamp-2">{item.description}</p>
+                  <div className="flex items-center justify-between mt-3 text-xs text-gray-500 dark:text-gray-400">
+                    <span>{item.category_name || t('browse.uncategorized') || 'Uncategorized'}</span>
+                    <span>{new Date(item.found_date).toLocaleDateString(language === 'zh' ? 'zh-CN' : language === 'hi' ? 'hi-IN' : language)}</span>
                   </div>
                 </div>
               </Link>
@@ -296,11 +296,11 @@ const Browse = () => {
           </div>
         ) : (
           <div className="text-center py-16">
-            <Package className="w-20 h-20 text-gray-300 mx-auto mb-4" />
-            <h3 className="text-xl font-medium text-gray-600">{t('browse.noItems')}</h3>
-            <p className="text-gray-400 mt-2">{t('browse.tryAdjusting', 'Try adjusting your search or filters')}</p>
-            <button onClick={resetFilters} className="mt-4 text-navy-600 hover:underline">
-              {t('browse.clearFilters', 'Clear all filters')}
+            <Package className="w-20 h-20 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
+            <h3 className="text-xl font-medium text-gray-600 dark:text-gray-400">{t('browse.noItems')}</h3>
+            <p className="text-gray-400 dark:text-gray-500 mt-2">{t('browse.tryAdjusting') || 'Try adjusting your search or filters'}</p>
+            <button onClick={resetFilters} className="mt-4 text-navy-600 dark:text-carolina-400 hover:underline">
+              {t('browse.clearFilters') || 'Clear all filters'}
             </button>
           </div>
         )}
@@ -311,17 +311,17 @@ const Browse = () => {
             <button
               onClick={() => setPagination(p => ({ ...p, page: p.page - 1 }))}
               disabled={pagination.page === 1}
-              className="p-2 rounded-lg border hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="p-2 rounded-lg border dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed text-gray-700 dark:text-gray-300"
             >
               <ChevronLeft className="w-5 h-5"/>
             </button>
-            <span className="text-gray-600">
-              Page {pagination.page} of {Math.ceil(pagination.total / pagination.limit)}
+            <span className="text-gray-600 dark:text-gray-400">
+              {t('browse.page') || 'Page'} {pagination.page} {t('browse.of') || 'of'} {Math.ceil(pagination.total / pagination.limit)}
             </span>
             <button
               onClick={() => setPagination(p => ({ ...p, page: p.page + 1 }))}
               disabled={pagination.page * pagination.limit >= pagination.total}
-              className="p-2 rounded-lg border hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="p-2 rounded-lg border dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed text-gray-700 dark:text-gray-300"
             >
               <ChevronRight className="w-5 h-5"/>
             </button>

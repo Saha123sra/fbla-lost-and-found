@@ -2,8 +2,10 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { UserPlus, Eye, EyeOff, Package, CheckCircle } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useLanguage } from '../context/LanguageContext';
 
 const Register = () => {
+  const { t } = useLanguage();
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -82,7 +84,7 @@ const Register = () => {
             <Package className="w-8 h-8 text-skyblue-300" />
             <span className="font-bold text-xl">Lost Dane Found</span>
           </div>
-          <p className="text-skyblue-200 text-sm">Create your account</p>
+          <p className="text-skyblue-200 text-sm">{t('auth.createAccount') || 'Create your account'}</p>
         </div>
 
         {/* Form */}
@@ -98,7 +100,7 @@ const Register = () => {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  First Name *
+                  {t('auth.firstName')} *
                 </label>
                 <input
                   type="text"
@@ -111,7 +113,7 @@ const Register = () => {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Last Name *
+                  {t('auth.lastName')} *
                 </label>
                 <input
                   type="text"
@@ -128,7 +130,7 @@ const Register = () => {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Student ID *
+                  {t('auth.studentId')} *
                 </label>
                 <input
                   type="text"
@@ -141,7 +143,7 @@ const Register = () => {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Grade Level
+                  {t('auth.gradeLevel')}
                 </label>
                 <select
                   name="gradeLevel"
@@ -149,7 +151,7 @@ const Register = () => {
                   onChange={handleChange}
                   className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-navy-500 focus:border-navy-500 outline-none"
                 >
-                  <option value="">Select...</option>
+                  <option value="">{t('auth.select') || 'Select...'}</option>
                   {gradeLevels.map(level => (
                     <option key={level} value={level}>{level}</option>
                   ))}
@@ -160,7 +162,7 @@ const Register = () => {
             {/* Email */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                School Email *
+                {t('auth.email')} *
               </label>
               <input
                 type="email"
@@ -175,7 +177,7 @@ const Register = () => {
             {/* Password */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Password *
+                {t('auth.password')} *
               </label>
               <div className="relative">
                 <input
@@ -183,7 +185,7 @@ const Register = () => {
                   name="password"
                   value={formData.password}
                   onChange={handleChange}
-                  placeholder="At least 6 characters"
+                  placeholder={t('auth.passwordPlaceholder') || 'At least 6 characters'}
                   className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-navy-500 focus:border-navy-500 outline-none pr-12"
                 />
                 <button
@@ -199,14 +201,14 @@ const Register = () => {
             {/* Confirm Password */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Confirm Password *
+                {t('auth.confirmPassword')} *
               </label>
               <input
                 type={showPassword ? 'text' : 'password'}
                 name="confirmPassword"
                 value={formData.confirmPassword}
                 onChange={handleChange}
-                placeholder="Re-enter your password"
+                placeholder={t('auth.confirmPasswordPlaceholder') || 'Re-enter your password'}
                 className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-navy-500 focus:border-navy-500 outline-none"
               />
             </div>
@@ -221,16 +223,16 @@ const Register = () => {
               ) : (
                 <>
                   <UserPlus className="w-5 h-5 mr-2" />
-                  Create Account
+                  {t('auth.createAccount') || 'Create Account'}
                 </>
               )}
             </button>
           </div>
 
           <p className="mt-6 text-center text-sm text-gray-600">
-            Already have an account?{' '}
+            {t('auth.hasAccount')}{' '}
             <Link to="/login" className="text-navy-600 hover:text-navy-700 font-medium">
-              Sign in
+              {t('auth.login')}
             </Link>
           </p>
         </div>

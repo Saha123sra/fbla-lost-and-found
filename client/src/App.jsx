@@ -28,6 +28,7 @@ import OwnerDashboard from './pages/OwnerDashboard';
 import VerifyOTP from './pages/VerifyOTP';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
+import EditItem from './pages/EditItem';
 
 // Protected route wrapper
 const ProtectedRoute = ({ children, adminOnly = false, ownerOnly = false }) => {
@@ -35,7 +36,7 @@ const ProtectedRoute = ({ children, adminOnly = false, ownerOnly = false }) => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-navy-600"></div>
       </div>
     );
@@ -61,7 +62,7 @@ const App = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-navy-600 mx-auto"></div>
           <p className="mt-4 text-gray-600">Loading...</p>
@@ -71,7 +72,7 @@ const App = () => {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50">
+    <div className="min-h-screen flex flex-col transition-colors duration-300">
       <Navbar />
 
       <main className="flex-grow">
@@ -133,6 +134,14 @@ const App = () => {
               </ProtectedRoute>
             }
           />
+          <Route
+            path="/items/:id/edit"
+            element={
+              <ProtectedRoute>
+                <EditItem />
+              </ProtectedRoute>
+            }
+          />
           {/* Admin routes */}
           <Route
             path="/admin/*"
@@ -159,8 +168,8 @@ const App = () => {
             element={
               <div className="min-h-[60vh] flex items-center justify-center">
                 <div className="text-center">
-                  <h1 className="text-6xl font-bold text-gray-300">404</h1>
-                  <p className="text-xl text-gray-600 mt-4">Page not found</p>
+                  <h1 className="text-6xl font-bold text-gray-300 dark:text-gray-600">404</h1>
+                  <p className="text-xl text-gray-600 dark:text-gray-400 mt-4">Page not found</p>
                   <a
                     href="/"
                     className="mt-6 inline-block bg-navy-600 text-white px-6 py-2 rounded-lg hover:bg-navy-700"

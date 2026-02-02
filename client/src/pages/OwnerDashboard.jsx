@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Crown, Users, Shield, CheckCircle, XCircle, Clock, Package, ClipboardList, UserX, UserCheck } from 'lucide-react';
 import { ownerAPI } from '../services/api';
+import { useLanguage } from '../context/LanguageContext';
 import toast from 'react-hot-toast';
 
 const OwnerDashboard = () => {
+  const { t, language } = useLanguage();
   const [stats, setStats] = useState({});
   const [pendingAdmins, setPendingAdmins] = useState([]);
   const [allAdmins, setAllAdmins] = useState([]);
@@ -98,8 +100,8 @@ const OwnerDashboard = () => {
           <div className="flex items-center gap-3">
             <Crown className="w-8 h-8 text-yellow-300" />
             <div>
-              <h1 className="text-2xl font-bold">Owner Dashboard</h1>
-              <p className="text-purple-200 text-sm">Site Administration</p>
+              <h1 className="text-2xl font-bold">{t('owner.title')}</h1>
+              <p className="text-purple-200 text-sm">{t('owner.siteAdmin')}</p>
             </div>
           </div>
         </div>
@@ -110,27 +112,27 @@ const OwnerDashboard = () => {
         <div className="grid grid-cols-2 md:grid-cols-6 gap-4 mb-8">
           <div className="bg-white p-4 rounded-xl shadow">
             <div className="text-3xl font-bold text-orange-500">{stats.pending_admins || 0}</div>
-            <div className="text-gray-600 text-sm">Pending Admins</div>
+            <div className="text-gray-600 text-sm">{t('owner.stats.pendingAdmins')}</div>
           </div>
           <div className="bg-white p-4 rounded-xl shadow">
             <div className="text-3xl font-bold text-green-600">{stats.active_admins || 0}</div>
-            <div className="text-gray-600 text-sm">Active Admins</div>
+            <div className="text-gray-600 text-sm">{t('owner.stats.activeAdmins')}</div>
           </div>
           <div className="bg-white p-4 rounded-xl shadow">
             <div className="text-3xl font-bold text-red-500">{stats.deactivated_admins || 0}</div>
-            <div className="text-gray-600 text-sm">Deactivated</div>
+            <div className="text-gray-600 text-sm">{t('owner.allAdmins.deactivated')}</div>
           </div>
           <div className="bg-white p-4 rounded-xl shadow">
             <div className="text-3xl font-bold text-blue-600">{stats.total_students || 0}</div>
-            <div className="text-gray-600 text-sm">Students</div>
+            <div className="text-gray-600 text-sm">{t('admin.tabs.students')}</div>
           </div>
           <div className="bg-white p-4 rounded-xl shadow">
             <div className="text-3xl font-bold text-navy-600">{stats.active_items || 0}</div>
-            <div className="text-gray-600 text-sm">Active Items</div>
+            <div className="text-gray-600 text-sm">{t('admin.stats.activeItems')}</div>
           </div>
           <div className="bg-white p-4 rounded-xl shadow">
             <div className="text-3xl font-bold text-yellow-600">{stats.pending_claims || 0}</div>
-            <div className="text-gray-600 text-sm">Pending Claims</div>
+            <div className="text-gray-600 text-sm">{t('admin.stats.pendingClaims')}</div>
           </div>
         </div>
 
@@ -146,7 +148,7 @@ const OwnerDashboard = () => {
               }`}
             >
               <Clock className="w-4 h-4" />
-              Pending Approvals
+              {t('owner.tabs.pendingAdmins')}
               {pendingAdmins.length > 0 && (
                 <span className="bg-orange-500 text-white text-xs px-2 py-0.5 rounded-full">
                   {pendingAdmins.length}
@@ -162,18 +164,18 @@ const OwnerDashboard = () => {
               }`}
             >
               <Shield className="w-4 h-4" />
-              All Admins
+              {t('owner.tabs.allAdmins')}
             </button>
           </div>
 
           <div className="p-6">
             {activeTab === 'pending' && (
               <div>
-                <h2 className="text-lg font-bold mb-4">Pending Admin Registrations</h2>
+                <h2 className="text-lg font-bold mb-4">{t('owner.pendingAdmins.title')}</h2>
                 {pendingAdmins.length === 0 ? (
                   <div className="text-center py-8 text-gray-500">
                     <CheckCircle className="w-12 h-12 mx-auto mb-2 text-green-500" />
-                    No pending admin registrations
+                    {t('owner.pendingAdmins.noPending')}
                   </div>
                 ) : (
                   <div className="space-y-4">
@@ -184,10 +186,10 @@ const OwnerDashboard = () => {
                             <h3 className="font-bold text-lg">
                               {admin.first_name} {admin.last_name}
                             </h3>
-                            <p className="text-gray-600 text-sm">Admin ID: {admin.admin_id}</p>
+                            <p className="text-gray-600 text-sm">{t('owner.adminId')}: {admin.admin_id}</p>
                             <p className="text-gray-600 text-sm">{admin.email}</p>
                             <p className="text-gray-400 text-xs mt-1">
-                              Registered: {new Date(admin.created_at).toLocaleDateString()}
+                              {t('owner.pendingAdmins.requestedOn')}: {new Date(admin.created_at).toLocaleDateString(language === 'zh' ? 'zh-CN' : language === 'hi' ? 'hi-IN' : language)}
                             </p>
                           </div>
                           <div className="flex gap-2">
@@ -196,14 +198,14 @@ const OwnerDashboard = () => {
                               className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 flex items-center gap-1"
                             >
                               <CheckCircle className="w-4 h-4" />
-                              Approve
+                              {t('owner.pendingAdmins.approve')}
                             </button>
                             <button
                               onClick={() => setSelectedAdmin(admin)}
                               className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 flex items-center gap-1"
                             >
                               <XCircle className="w-4 h-4" />
-                              Deny
+                              {t('owner.pendingAdmins.deny')}
                             </button>
                           </div>
                         </div>
@@ -216,23 +218,23 @@ const OwnerDashboard = () => {
 
             {activeTab === 'admins' && (
               <div>
-                <h2 className="text-lg font-bold mb-4">All Administrators</h2>
+                <h2 className="text-lg font-bold mb-4">{t('owner.allAdmins.title')}</h2>
                 {allAdmins.length === 0 ? (
                   <div className="text-center py-8 text-gray-500">
                     <Users className="w-12 h-12 mx-auto mb-2 text-gray-300" />
-                    No administrators found
+                    {t('owner.allAdmins.noAdmins')}
                   </div>
                 ) : (
                   <div className="overflow-x-auto">
                     <table className="w-full">
                       <thead className="bg-gray-50">
                         <tr>
-                          <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">Name</th>
-                          <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">Admin ID</th>
-                          <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">Email</th>
-                          <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">Status</th>
-                          <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">Last Login</th>
-                          <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">Actions</th>
+                          <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">{t('admin.students.columns.name')}</th>
+                          <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">{t('owner.adminId')}</th>
+                          <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">{t('admin.students.columns.email')}</th>
+                          <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">{t('itemDetail.status')}</th>
+                          <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">{t('owner.lastLogin')}</th>
+                          <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">{t('owner.actions')}</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-gray-100">
@@ -251,13 +253,15 @@ const OwnerDashboard = () => {
                                   ? 'bg-yellow-100 text-yellow-700'
                                   : 'bg-red-100 text-red-700'
                               }`}>
-                                {admin.status}
+                                {admin.status === 'active' ? t('owner.allAdmins.active') :
+                                 admin.status === 'pending' ? t('claims.status.pending') :
+                                 t('owner.allAdmins.deactivated')}
                               </span>
                             </td>
                             <td className="px-4 py-3 text-gray-600 text-sm">
                               {admin.last_login
-                                ? new Date(admin.last_login).toLocaleDateString()
-                                : 'Never'}
+                                ? new Date(admin.last_login).toLocaleDateString(language === 'zh' ? 'zh-CN' : language === 'hi' ? 'hi-IN' : language)
+                                : t('owner.never')}
                             </td>
                             <td className="px-4 py-3">
                               {admin.status === 'active' && (
@@ -266,7 +270,7 @@ const OwnerDashboard = () => {
                                   className="text-red-600 hover:text-red-700 text-sm flex items-center gap-1"
                                 >
                                   <UserX className="w-4 h-4" />
-                                  Deactivate
+                                  {t('owner.allAdmins.deactivate')}
                                 </button>
                               )}
                               {admin.status === 'deactivated' && (
@@ -275,7 +279,7 @@ const OwnerDashboard = () => {
                                   className="text-green-600 hover:text-green-700 text-sm flex items-center gap-1"
                                 >
                                   <UserCheck className="w-4 h-4" />
-                                  Reactivate
+                                  {t('owner.allAdmins.reactivate')}
                                 </button>
                               )}
                             </td>
@@ -295,17 +299,17 @@ const OwnerDashboard = () => {
       {selectedAdmin && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-xl max-w-md w-full p-6">
-            <h3 className="text-xl font-bold mb-4">Deny Admin Registration</h3>
+            <h3 className="text-xl font-bold mb-4">{t('owner.denyModal.title')}</h3>
             <p className="text-gray-600 mb-4">
-              Denying registration for: <strong>{selectedAdmin.first_name} {selectedAdmin.last_name}</strong>
+              {t('owner.denyModal.denyingFor')}: <strong>{selectedAdmin.first_name} {selectedAdmin.last_name}</strong>
             </p>
             <div className="mb-4">
-              <label className="block text-sm font-medium mb-2">Reason (optional)</label>
+              <label className="block text-sm font-medium mb-2">{t('owner.denyModal.reasonLabel')} ({t('common.optional')})</label>
               <textarea
                 value={denyReason}
                 onChange={(e) => setDenyReason(e.target.value)}
                 rows={3}
-                placeholder="Enter reason for denial..."
+                placeholder={t('owner.denyModal.reasonPlaceholder')}
                 className="w-full border border-gray-300 rounded-lg px-3 py-2"
               />
             </div>
@@ -317,13 +321,13 @@ const OwnerDashboard = () => {
                 }}
                 className="flex-1 border border-gray-300 py-2 rounded-lg hover:bg-gray-50"
               >
-                Cancel
+                {t('common.cancel')}
               </button>
               <button
                 onClick={handleDeny}
                 className="flex-1 bg-red-600 text-white py-2 rounded-lg hover:bg-red-700"
               >
-                Deny Registration
+                {t('owner.denyModal.denyButton')}
               </button>
             </div>
           </div>

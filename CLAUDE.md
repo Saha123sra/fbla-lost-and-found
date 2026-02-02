@@ -260,7 +260,7 @@ const Component = () => {
 
 ## Known Issues / TODOs
 
-1. **Email Service**: `server/services/emailService.js` logs emails but doesn't send them. Needs Resend API integration.
+1. **Email Service**: `server/services/emailService.js` uses Gmail/Nodemailer. Set `GMAIL_USER` and `GMAIL_APP_PASSWORD` in `.env` to enable. Without credentials, emails are logged to console.
 
 2. **Image Upload**: Items use placeholder image URLs. Need to implement actual file upload to cloud storage.
 
@@ -278,7 +278,8 @@ PORT=3000
 DATABASE_URL=postgresql://...
 JWT_SECRET=<secret>
 JWT_EXPIRES_IN=24h
-RESEND_API_KEY=<key>
+GMAIL_USER=your-email@gmail.com
+GMAIL_APP_PASSWORD=xxxx xxxx xxxx xxxx
 FRONTEND_URL=http://localhost:5173
 ```
 

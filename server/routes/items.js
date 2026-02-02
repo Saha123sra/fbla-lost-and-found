@@ -304,14 +304,14 @@ router.post('/', authenticate, upload.single('image'), async (req, res) => {
 });
 
 // ===================
-// UPDATE ITEM
+// UPDATE ITEM (with optional image upload)
 // ===================
-router.patch('/:id', authenticate, async (req, res) => {
+router.patch('/:id', authenticate, upload.single('image'), async (req, res) => {
   try {
     const { name, description, categoryId, locationId, locationDetail, status } = req.body;
 
     // Check if user owns the item or is admin
-    const itemResult = await query('SELECT found_by FROM items WHERE id = $1', [req.params.id]);
+    const itemResult = await query('SELECT found_by, image_url FROM items WHERE id = $1', [req.params.id]);
 
     if (itemResult.rows.length === 0) {
       return res.status(404).json({ error: 'Item not found' });
@@ -319,6 +319,19 @@ router.patch('/:id', authenticate, async (req, res) => {
 
     if (itemResult.rows[0].found_by !== req.user.id && req.user.role !== 'admin') {
       return res.status(403).json({ error: 'Not authorized to update this item' });
+    }
+
+    // Handle image upload if provided
+    let imageUrl = itemResult.rows[0].image_url;
+    if (req.file) {
+      try {
+        const uploadResult = await uploadImage(req.file.buffer, req.file.originalname, 'items');
+        imageUrl = uploadResult.url;
+        console.log('New image uploaded:', imageUrl);
+      } catch (uploadError) {
+        console.error('Image upload failed:', uploadError);
+        // Continue with update even if image upload fails
+      }
     }
 
     const result = await query(
@@ -329,10 +342,11 @@ router.patch('/:id', authenticate, async (req, res) => {
         location_id = COALESCE($4, location_id),
         location_detail = COALESCE($5, location_detail),
         status = COALESCE($6, status),
+        image_url = COALESCE($7, image_url),
         updated_at = NOW()
-       WHERE id = $7
+       WHERE id = $8
        RETURNING *`,
-      [name, description, categoryId, locationId, locationDetail, status, req.params.id]
+      [name, description, categoryId, locationId, locationDetail, status, imageUrl, req.params.id]
     );
 
     res.json(result.rows[0]);

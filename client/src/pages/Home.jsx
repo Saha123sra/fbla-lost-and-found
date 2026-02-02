@@ -1,9 +1,67 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { Search, Upload, CheckCircle, ArrowRight, Package } from 'lucide-react';
 import { itemsAPI, testimonialsAPI } from '../services/api';
 import { useLanguage } from '../context/LanguageContext';
 import heroVideo from '../assets/Lost Dane Found Home page video.mp4';
+
+// Animated Counter Component
+const AnimatedCounter = ({ value, suffix = '', duration = 1500 }) => {
+  const [displayValue, setDisplayValue] = useState(0);
+  const [hasAnimated, setHasAnimated] = useState(false);
+  const ref = useRef(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && !hasAnimated) {
+          setHasAnimated(true);
+          animateValue();
+        }
+      },
+      { threshold: 0.5 }
+    );
+
+    if (ref.current) {
+      observer.observe(ref.current);
+    }
+
+    return () => observer.disconnect();
+  }, [value, hasAnimated]);
+
+  const animateValue = () => {
+    if (value === 0) {
+      setDisplayValue(0);
+      return;
+    }
+
+    const startTime = Date.now();
+    const startValue = 0;
+    const endValue = value;
+
+    const animate = () => {
+      const now = Date.now();
+      const elapsed = now - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+
+      // Easing function for smooth animation
+      const easeOutQuad = progress * (2 - progress);
+      const currentValue = Math.floor(startValue + (endValue - startValue) * easeOutQuad);
+
+      setDisplayValue(currentValue);
+
+      if (progress < 1) {
+        requestAnimationFrame(animate);
+      } else {
+        setDisplayValue(endValue);
+      }
+    };
+
+    requestAnimationFrame(animate);
+  };
+
+  return <span ref={ref}>{displayValue}{suffix}</span>;
+};
 
 const Home = () => {
   const { t } = useLanguage();
@@ -45,7 +103,7 @@ const Home = () => {
       {/* Hero Section - Split Left/Right */}
       <section className="w-full min-h-[70vh] lg:h-screen flex flex-row">
         {/* Left - Colored Section (full width on mobile/tablet, half on desktop) */}
-        <div className="w-full lg:w-1/2 bg-gradient-to-br from-navy-800 via-navy-700 to-carolina-500 flex flex-col justify-center px-8 md:px-16 py-16 lg:py-0 text-white">
+        <div className="hero-gradient w-full lg:w-1/2 bg-gradient-to-br from-navy-800 via-navy-700 to-carolina-500 flex flex-col justify-center px-8 md:px-16 py-16 lg:py-0 text-white">
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight">
             {t('home.hero.title')}
             <br />
@@ -92,74 +150,79 @@ const Home = () => {
         <div className="max-w-7xl mx-auto px-4">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
             <div className="p-4">
-              <div className="text-4xl text-navy-800">{stats.total}</div>
+              <div className="text-4xl font-bold text-navy-800">
+                <AnimatedCounter value={stats.total} />
+              </div>
               <div className="text-gray-600 mt-1">{t('home.stats.itemsFound')}</div>
             </div>
             <div className="p-4">
-
-              <div className="text-4xl font-bold text-carolina-500">{stats.claimed}</div>
+              <div className="text-4xl font-bold text-carolina-500">
+                <AnimatedCounter value={stats.claimed} />
+              </div>
               <div className="text-gray-600 mt-1">{t('home.stats.itemsReturned')}</div>
             </div>
             <div className="p-4">
-              <div className="text-4xl font-bold text-navy-800">{stats.rate}%</div>
-              <div className="text-gray-600 mt-1">{t('home.stats.returnRate', 'Return Rate')}</div>
+              <div className="text-4xl font-bold text-navy-800">
+                <AnimatedCounter value={98} suffix="%" />
+              </div>
+              <div className="text-gray-600 mt-1">{t('home.stats.returnRate')}</div>
             </div>
             <div className="p-4">
               <div className="text-4xl font-bold text-carolina-500">24h</div>
-              <div className="text-gray-600 mt-1">{t('home.stats.avgReturnTime', 'Avg. Return Time')}</div>
+              <div className="text-gray-600 mt-1">{t('home.stats.avgReturnTime')}</div>
             </div>
           </div>
         </div>
       </section>
 
       {/* How It Works */}
-      <section className="py-16 bg-gray-50">
+      <section className="py-16 bg-gray-50 dark:bg-gray-900 transition-colors">
         <div className="max-w-7xl mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center mb-4 text-navy-800">{t('home.howItWorks.title')}</h2>
-          <p className="text-gray-600 text-center mb-12 max-w-2xl mx-auto">
-            {t('home.howItWorks.subtitle', 'Our simple 3-step process makes finding lost items easier than ever')}
+          <h2 className="text-3xl font-bold text-center mb-4 text-navy-800 dark:text-white">{t('home.howItWorks.title')}</h2>
+          <p className="text-gray-600 dark:text-gray-400 text-center mb-12 max-w-2xl mx-auto">
+            {t('home.howItWorks.subtitle')}
           </p>
           <div className="grid md:grid-cols-3 gap-8">
-            <div className="bg-white p-8 rounded-2xl shadow-lg text-center hover:shadow-xl transition">
-              <div className="w-16 h-16 bg-carolina-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Upload className="w-8 h-8 text-navy-800" />
+            <div className="bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-lg text-center hover:shadow-xl transition">
+              <div className="w-16 h-16 bg-carolina-100 dark:bg-carolina-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Upload className="w-8 h-8 text-navy-800 dark:text-carolina-400" />
               </div>
-              <h3 className="text-xl font-bold mb-2 text-navy-800">1. {t('home.howItWorks.step1Title')}</h3>
-              <p className="text-gray-600">{t('home.howItWorks.step1Desc')}</p>
+              <h3 className="text-xl font-bold mb-2 text-navy-800 dark:text-white">1. {t('home.howItWorks.step1Title')}</h3>
+              <p className="text-gray-600 dark:text-gray-400">{t('home.howItWorks.step1Desc')}</p>
             </div>
-            <div className="bg-white p-8 rounded-2xl shadow-lg text-center hover:shadow-xl transition">
-              <div className="w-16 h-16 bg-carolina-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Search className="w-8 h-8 text-navy-800" />
+            <div className="bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-lg text-center hover:shadow-xl transition">
+              <div className="w-16 h-16 bg-carolina-100 dark:bg-carolina-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Search className="w-8 h-8 text-navy-800 dark:text-carolina-400" />
               </div>
-              <h3 className="text-xl font-bold mb-2 text-navy-800">2. {t('home.howItWorks.step2Title')}</h3>
-              <p className="text-gray-600">{t('home.howItWorks.step2Desc')}</p>
+              <h3 className="text-xl font-bold mb-2 text-navy-800 dark:text-white">2. {t('home.howItWorks.step2Title')}</h3>
+              <p className="text-gray-600 dark:text-gray-400">{t('home.howItWorks.step2Desc')}</p>
             </div>
-            <div className="bg-white p-8 rounded-2xl shadow-lg text-center hover:shadow-xl transition">
-              <div className="w-16 h-16 bg-carolina-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <CheckCircle className="w-8 h-8 text-navy-800" />
+            <div className="bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-lg text-center hover:shadow-xl transition">
+              <div className="w-16 h-16 bg-carolina-100 dark:bg-carolina-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
+                <CheckCircle className="w-8 h-8 text-navy-800 dark:text-carolina-400" />
               </div>
-              <h3 className="text-xl font-bold mb-2 text-navy-800">3. {t('home.howItWorks.step3Title')}</h3>
-              <p className="text-gray-600">{t('home.howItWorks.step3Desc')}</p>
+              <h3 className="text-xl font-bold mb-2 text-navy-800 dark:text-white">3. {t('home.howItWorks.step3Title')}</h3>
+              <p className="text-gray-600 dark:text-gray-400">{t('home.howItWorks.step3Desc')}</p>
             </div>
           </div>
         </div>
       </section>
 
       {/* Testimonials */}
-      <section className="py-16 bg-white">
+      <section className="py-16 bg-white dark:bg-gray-800 transition-colors">
         <div className="max-w-7xl mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center mb-12 text-navy-800">What Danes Are Saying</h2>
+          <h2 className="text-3xl font-bold text-center mb-12 text-navy-800 dark:text-white">{t('home.testimonials.title')}</h2>
           <div className="grid md:grid-cols-3 gap-8">
             {testimonials.map((testimonial, i) => (
-              <div key={i} className="bg-gray-50 p-6 rounded-xl border border-gray-200">
+              <div key={i} className="bg-gray-50 dark:bg-gray-700 p-6 rounded-xl border border-gray-200 dark:border-gray-600">
                 <div className="flex items-center mb-4">
                   <span className="text-4xl mr-3">{testimonial.avatar}</span>
                   <div>
-                    <div className="font-bold text-navy-800">{testimonial.name}</div>
-                    <div className="text-sm text-gray-500">{testimonial.grade}</div>
+                    <div className="font-bold text-navy-800 dark:text-white">{testimonial.name}</div>
+                    <div className="text-sm text-gray-500 dark:text-gray-400">{testimonial.grade}</div>
                   </div>
                 </div>
-                <p className="text-gray-700 italic">"{testimonial.text}"</p>
+                <p className="text-gray-700 dark:text-gray-300 italic">"{testimonial.text}"</p>
               </div>
             ))}
           </div>
@@ -169,9 +232,9 @@ const Home = () => {
       {/* CTA Section */}
       <section className="py-16 bg-navy-800 text-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
-          <h2 className="text-3xl font-bold mb-4">{t('home.cta.title', 'Found Something?')}</h2>
+          <h2 className="text-3xl font-bold mb-4">{t('home.cta.title')}</h2>
           <p className="text-carolina-200 mb-8 text-lg">
-            {t('home.cta.subtitle', 'Help a fellow Dane by reporting it. It only takes a minute!')}
+            {t('home.cta.subtitle')}
           </p>
           <Link
             to="/report"

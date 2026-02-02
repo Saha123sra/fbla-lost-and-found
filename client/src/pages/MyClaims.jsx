@@ -151,7 +151,7 @@ const MyClaims = () => {
                           <div>
                             <h3 className="font-bold text-lg">{claim.item_name}</h3>
                             <p className="text-gray-500 text-sm">
-                              Claimed on {new Date(claim.created_at).toLocaleDateString()}
+                              {t('claims.claimedOn') || 'Claimed on'} {new Date(claim.created_at).toLocaleDateString()}
                             </p>
                           </div>
                           <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${status.bg} ${status.color}`}>
@@ -163,7 +163,7 @@ const MyClaims = () => {
                         {/* Pickup Info (if approved) */}
                         {claim.status === 'approved' && claim.pickup_date && (
                           <div className="mt-4 bg-green-50 border border-green-200 rounded-lg p-4">
-                            <h4 className="font-medium text-green-800 mb-2">📍 Pickup Information</h4>
+                            <h4 className="font-medium text-green-800 mb-2">📍 {t('claims.pickup')}</h4>
                             <div className="grid md:grid-cols-3 gap-2 text-sm">
                               <div className="flex items-center text-green-700">
                                 <Calendar className="w-4 h-4 mr-1" />
@@ -185,7 +185,7 @@ const MyClaims = () => {
                         {claim.status === 'denied' && claim.denial_reason && (
                           <div className="mt-4 bg-red-50 border border-red-200 rounded-lg p-4">
                             <p className="text-red-700 text-sm">
-                              <strong>Reason:</strong> {claim.denial_reason}
+                              <strong>{t('claims.reason') || 'Reason'}:</strong> {claim.denial_reason}
                             </p>
                           </div>
                         )}
@@ -197,7 +197,7 @@ const MyClaims = () => {
                               onClick={() => handleCancel(claim.id)}
                               className="text-red-600 hover:text-red-700 text-sm font-medium"
                             >
-                              Cancel Claim
+                              {t('claims.cancel')}
                             </button>
                           </div>
                         )}

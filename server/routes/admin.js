@@ -12,31 +12,20 @@ router.use(authenticate, requireAdmin);
 // ===================
 router.get('/stats', async (req, res) => {
   try {
-    // Get various statistics
-    const stats = await query(`
-      SELECT
-        (SELECT COUNT(*) FROM items WHERE status = 'available') as active_items,
-        (SELECT COUNT(*) FROM items WHERE status = 'claimed') as claimed_items,
-        (SELECT COUNT(*) FROM items WHERE status = 'pending') as pending_items,
-        (SELECT COUNT(*) FROM claims WHERE status = 'pending') as pending_claims,
-        (SELECT COUNT(*) FROM items) as total_items,
-        (SELECT COUNT(*) FROM claims) as total_claims,
-        (SELECT COUNT(*) FROM users WHERE role = 'student') as total_students,
-        (SELECT COUNT(*) FROM items WHERE date_reported >= CURRENT_DATE - INTERVAL '7 days') as items_this_week,
-        (SELECT COUNT(*) FROM claims WHERE created_at >= CURRENT_DATE - INTERVAL '7 days') as claims_this_week
-    `);
-    
+    // Get counts separately for better error handling
+    const activeItemsResult = await query("SELECT COUNT(*) as count FROM items WHERE status = 'available'");
+    const claimedItemsResult = await query("SELECT COUNT(*) as count FROM items WHERE status = 'claimed'");
+    const pendingItemsResult = await query("SELECT COUNT(*) as count FROM items WHERE status = 'pending'");
+    const pendingClaimsResult = await query("SELECT COUNT(*) as count FROM claims WHERE status = 'pending'");
+    const totalItemsResult = await query("SELECT COUNT(*) as count FROM items");
+    const totalClaimsResult = await query("SELECT COUNT(*) as count FROM claims");
+    const totalStudentsResult = await query("SELECT COUNT(*) as count FROM users WHERE role = 'student'");
+
     // Calculate success rate
-    const successRateResult = await query(`
-      SELECT 
-        ROUND(
-          COUNT(*) FILTER (WHERE status = 'claimed')::DECIMAL / 
-          NULLIF(COUNT(*), 0) * 100, 
-          1
-        ) as success_rate
-      FROM items
-    `);
-    
+    const totalItems = parseInt(totalItemsResult.rows[0]?.count) || 0;
+    const claimedItems = parseInt(claimedItemsResult.rows[0]?.count) || 0;
+    const successRate = totalItems > 0 ? Math.round((claimedItems / totalItems) * 100) : 0;
+
     // Get items by category
     const categoryStats = await query(`
       SELECT c.name, COUNT(i.id) as count
@@ -45,38 +34,19 @@ router.get('/stats', async (req, res) => {
       GROUP BY c.name
       ORDER BY count DESC
     `);
-    
-    // Get recent activity
-    const recentActivity = await query(`
-      SELECT 
-        'item' as type,
-        i.name as title,
-        i.date_reported as timestamp,
-        'New item reported' as action
-      FROM items i
-      ORDER BY i.date_reported DESC
-      LIMIT 5
-      
-      UNION ALL
-      
-      SELECT 
-        'claim' as type,
-        it.name as title,
-        c.created_at as timestamp,
-        'Claim submitted' as action
-      FROM claims c
-      JOIN items it ON c.item_id = it.id
-      ORDER BY timestamp DESC
-      LIMIT 10
-    `);
-    
+
     res.json({
-      ...stats.rows[0],
-      success_rate: successRateResult.rows[0]?.success_rate || 0,
-      category_breakdown: categoryStats.rows,
-      recent_activity: recentActivity.rows
+      active_items: parseInt(activeItemsResult.rows[0]?.count) || 0,
+      claimed_items: claimedItems,
+      pending_items: parseInt(pendingItemsResult.rows[0]?.count) || 0,
+      pending_claims: parseInt(pendingClaimsResult.rows[0]?.count) || 0,
+      total_items: totalItems,
+      total_claims: parseInt(totalClaimsResult.rows[0]?.count) || 0,
+      total_students: parseInt(totalStudentsResult.rows[0]?.count) || 0,
+      success_rate: successRate,
+      category_breakdown: categoryStats.rows
     });
-    
+
   } catch (error) {
     console.error('Get stats error:', error);
     res.status(500).json({ error: 'Failed to fetch statistics' });
@@ -145,11 +115,11 @@ router.get('/claims', async (req, res) => {
     const offset = (page - 1) * limit;
     
     let queryText = `
-      SELECT 
+      SELECT
         c.*,
         i.name as item_name, i.image_url,
         u.first_name || ' ' || u.last_name as user_name,
-        u.email as user_email, u.student_id,
+        u.email as user_email, u.student_id as user_student_id,
         r.first_name || ' ' || r.last_name as reviewed_by_name
       FROM claims c
       JOIN items i ON c.item_id = i.id

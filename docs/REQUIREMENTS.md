@@ -1006,7 +1006,7 @@ Thank you for using Lost Dane Found!
 
 | ID | Requirement |
 |----|-------------|
-| INT-EMAIL-001 | Resend or SendGrid integration |
+| INT-EMAIL-001 | Gmail/Nodemailer, Resend, or SendGrid integration |
 | INT-EMAIL-002 | Template-based emails |
 | INT-EMAIL-003 | Async sending (non-blocking) |
 
@@ -1088,7 +1088,7 @@ Thank you for using Lost Dane Found!
 | Database | PostgreSQL (Supabase) |
 | Storage | Supabase Storage or AWS S3 |
 | AI | External API or hosted model |
-| Email | Resend or SendGrid |
+| Email | Gmail/Nodemailer (recommended), Resend, or SendGrid |
 | Domain | Custom domain with SSL |
 
 ### 12.3 Environment Variables
@@ -1104,9 +1104,10 @@ JWT_EXPIRES_IN=24h
 OWNER_EMAIL=owner@lostdanefound.com
 OWNER_PASSWORD=<secure_password>
 
-# Email
-RESEND_API_KEY=<key>
-FROM_EMAIL=noreply@lostdanefound.com
+# Email (Gmail/Nodemailer)
+GMAIL_USER=your-email@gmail.com
+GMAIL_APP_PASSWORD=xxxx xxxx xxxx xxxx
+FROM_EMAIL=Lost Dane Found <your-email@gmail.com>
 
 # AI Service
 AI_API_URL=https://...
