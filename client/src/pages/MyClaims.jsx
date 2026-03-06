@@ -151,7 +151,7 @@ const MyClaims = () => {
                           <div>
                             <h3 className="font-bold text-lg">{claim.item_name}</h3>
                             <p className="text-gray-500 text-sm">
-                              {t('claims.claimedOn') || 'Claimed on'} {new Date(claim.created_at).toLocaleDateString()}
+                              {t('claims.claimedOn') || 'Claimed on'} {new Date(claim.created_at).toLocaleDateString('en-US')}
                             </p>
                           </div>
                           <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${status.bg} ${status.color}`}>
@@ -167,7 +167,7 @@ const MyClaims = () => {
                             <div className="grid md:grid-cols-3 gap-2 text-sm">
                               <div className="flex items-center text-green-700">
                                 <Calendar className="w-4 h-4 mr-1" />
-                                {new Date(claim.pickup_date).toLocaleDateString()}
+                                {new Date(claim.pickup_date).toLocaleDateString('en-US')}
                               </div>
                               <div className="flex items-center text-green-700">
                                 <Clock className="w-4 h-4 mr-1" />

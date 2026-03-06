@@ -147,9 +147,7 @@ const ItemDetail = () => {
                     {t('itemDetail.dateFound')}
                   </div>
                   <p className="font-medium text-gray-800">
-                    {new Date(item.found_date).toLocaleDateString(language === 'zh' ? 'zh-CN' : language === 'hi' ? 'hi-IN' : language, {
-                      weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
-                    })}
+                    {new Date(item.found_date).toLocaleDateString('en-US')}
                   </p>
                 </div>
                 {item.found_by_name && (
@@ -167,7 +165,7 @@ const ItemDetail = () => {
                     {t('itemDetail.status')}
                   </div>
                   <p className="font-medium text-gray-800">
-                    {new Date(item.date_reported).toLocaleDateString(language === 'zh' ? 'zh-CN' : language === 'hi' ? 'hi-IN' : language)}
+                    {new Date(item.date_reported).toLocaleDateString('en-US')}
                   </p>
                 </div>
               </div>

@@ -303,7 +303,7 @@ const StudentDirectory = ({ t }) => {
                   <td className="px-6 py-4 text-gray-600">{student.grade_level || '-'}</td>
                   <td className="px-6 py-4 text-gray-600">{student.total_claims || 0}</td>
                   <td className="px-6 py-4 text-gray-600">{student.items_reported || 0}</td>
-                  <td className="px-6 py-4 text-gray-600">{new Date(student.created_at).toLocaleDateString()}</td>
+                  <td className="px-6 py-4 text-gray-600">{new Date(student.created_at).toLocaleDateString('en-US')}</td>
                 </tr>
               ))}
             </tbody>

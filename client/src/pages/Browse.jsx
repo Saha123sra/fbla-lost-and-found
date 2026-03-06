@@ -288,7 +288,7 @@ const Browse = () => {
                   <p className="text-gray-600 dark:text-gray-400 text-sm mt-1 line-clamp-2">{item.description}</p>
                   <div className="flex items-center justify-between mt-3 text-xs text-gray-500 dark:text-gray-400">
                     <span>{item.category_name || t('browse.uncategorized') || 'Uncategorized'}</span>
-                    <span>{new Date(item.found_date).toLocaleDateString(language === 'zh' ? 'zh-CN' : language === 'hi' ? 'hi-IN' : language)}</span>
+                    <span>{new Date(item.found_date).toLocaleDateString('en-US')}</span>
                   </div>
                 </div>
               </Link>

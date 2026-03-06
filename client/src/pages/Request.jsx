@@ -518,7 +518,7 @@ const Request = () => {
                         )}
                         <span className="flex items-center gap-1">
                           <Calendar className="w-3 h-3" />
-                          {new Date(item.found_date).toLocaleDateString()}
+                          {new Date(item.found_date).toLocaleDateString('en-US')}
                         </span>
                       </div>
                     </div>

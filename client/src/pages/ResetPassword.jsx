@@ -70,7 +70,7 @@ const ResetPassword = () => {
   // Loading state
   if (verifying) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-navy-600 to-navy-800 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-gradient-to-br from-navy-600 to-navy-800 dark:from-gray-800 dark:to-gray-900 flex items-center justify-center p-4">
         <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-8 text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-navy-600 mx-auto"></div>
           <p className="mt-4 text-gray-600">Verifying reset link...</p>
@@ -82,7 +82,7 @@ const ResetPassword = () => {
   // Invalid token
   if (!tokenValid) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-navy-600 to-navy-800 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-gradient-to-br from-navy-600 to-navy-800 dark:from-gray-800 dark:to-gray-900 flex items-center justify-center p-4">
         <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden">
           <div className="bg-red-600 text-white p-8 text-center">
             <XCircle className="w-16 h-16 mx-auto mb-4" />
@@ -118,7 +118,7 @@ const ResetPassword = () => {
   // Success state
   if (success) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-navy-600 to-navy-800 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-gradient-to-br from-navy-600 to-navy-800 dark:from-gray-800 dark:to-gray-900 flex items-center justify-center p-4">
         <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden">
           <div className="bg-green-600 text-white p-8 text-center">
             <CheckCircle className="w-16 h-16 mx-auto mb-4" />
@@ -144,7 +144,7 @@ const ResetPassword = () => {
 
   // Reset password form
   return (
-    <div className="min-h-screen bg-gradient-to-br from-navy-600 to-navy-800 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-navy-600 to-navy-800 dark:from-gray-800 dark:to-gray-900 flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden">
         <div className="bg-navy-700 text-white p-8 text-center">
           <Lock className="w-12 h-12 mx-auto mb-4 text-carolina" />

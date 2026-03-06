@@ -160,7 +160,7 @@ const Claim = () => {
           <div>
             <h3 className="font-bold text-lg">{item?.name}</h3>
             <p className="text-gray-500 text-sm">📍 {item?.location_name}</p>
-            <p className="text-gray-500 text-sm">📅 {t('itemDetail.dateFound')}: {new Date(item?.found_date).toLocaleDateString(language === 'zh' ? 'zh-CN' : language === 'hi' ? 'hi-IN' : language)}</p>
+            <p className="text-gray-500 text-sm">📅 {t('itemDetail.dateFound')}: {new Date(item?.found_date).toLocaleDateString('en-US')}</p>
           </div>
         </div>
 

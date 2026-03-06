@@ -76,7 +76,7 @@ const Register = () => {
   const gradeLevels = ['Freshman', 'Sophomore', 'Junior', 'Senior', 'Staff'];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-navy-600 to-navy-800 flex items-center justify-center p-4 py-12">
+    <div className="min-h-screen bg-gradient-to-br from-navy-600 to-navy-800 dark:from-gray-800 dark:to-gray-900 flex items-center justify-center p-4 py-12">
       <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden">
         {/* Header */}
         <div className="bg-navy-700 text-white p-6 text-center">

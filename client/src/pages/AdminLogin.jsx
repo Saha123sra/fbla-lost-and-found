@@ -60,7 +60,7 @@ const AdminLogin = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-navy-600 to-navy-800 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-navy-600 to-navy-800 dark:from-gray-800 dark:to-gray-900 flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden">
         <div className="bg-navy-700 text-white p-8 text-center">
           <h1 className="text-2xl font-bold">
@@ -70,14 +70,14 @@ const AdminLogin = () => {
 
         <div className="p-8">
           {/* Login Type Toggle */}
-          <div className="flex mb-6 bg-gray-100 rounded-lg p-1">
+          <div className="flex mb-6 bg-gray-100 dark:bg-gray-100/10 rounded-lg p-1">
             <button
               type="button"
               onClick={() => setLoginType('owner')}
               className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition flex items-center justify-center gap-2 ${
                 loginType === 'owner'
-                  ? 'bg-white text-navy-700 shadow'
-                  : 'text-gray-600 hover:text-gray-800'
+                  ? 'bg-white text-navy-700 shadow dark:text-blue-400'
+                  : 'text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-300'
               }`}
             >
               <Crown className="w-4 h-4" />
@@ -88,8 +88,8 @@ const AdminLogin = () => {
               onClick={() => setLoginType('admin')}
               className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition flex items-center justify-center gap-2 ${
                 loginType === 'admin'
-                  ? 'bg-white text-navy-700 shadow'
-                  : 'text-gray-600 hover:text-gray-800'
+                  ? 'bg-white text-navy-700 shadow dark:text-blue-400'
+                  : 'text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-300'
               }`}
             >
               <Shield className="w-4 h-4" />
@@ -114,7 +114,7 @@ const AdminLogin = () => {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="demo@lostdanefound.com"
+                  placeholder={t('auth.enterEmail', 'Enter your email')}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-navy-500 outline-none transition"
                 />
               </div>

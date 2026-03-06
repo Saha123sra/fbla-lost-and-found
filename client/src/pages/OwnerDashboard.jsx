@@ -189,7 +189,7 @@ const OwnerDashboard = () => {
                             <p className="text-gray-600 text-sm">{t('owner.adminId')}: {admin.admin_id}</p>
                             <p className="text-gray-600 text-sm">{admin.email}</p>
                             <p className="text-gray-400 text-xs mt-1">
-                              {t('owner.pendingAdmins.requestedOn')}: {new Date(admin.created_at).toLocaleDateString(language === 'zh' ? 'zh-CN' : language === 'hi' ? 'hi-IN' : language)}
+                              {t('owner.pendingAdmins.requestedOn')}: {new Date(admin.created_at).toLocaleDateString('en-US')}
                             </p>
                           </div>
                           <div className="flex gap-2">
@@ -260,7 +260,7 @@ const OwnerDashboard = () => {
                             </td>
                             <td className="px-4 py-3 text-gray-600 text-sm">
                               {admin.last_login
-                                ? new Date(admin.last_login).toLocaleDateString(language === 'zh' ? 'zh-CN' : language === 'hi' ? 'hi-IN' : language)
+                                ? new Date(admin.last_login).toLocaleDateString('en-US')
                                 : t('owner.never')}
                             </td>
                             <td className="px-4 py-3">

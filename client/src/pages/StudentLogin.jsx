@@ -36,7 +36,7 @@ const StudentLogin = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-navy-600 to-navy-800 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-navy-600 to-navy-800 dark:from-gray-800 dark:to-gray-900 flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden">
         <div className="bg-navy-700 text-white p-8 text-center">
           <h1 className="text-2xl font-bold">{t('auth.studentLogin', 'Student Login')}</h1>
@@ -98,9 +98,13 @@ const StudentLogin = () => {
             <Link to="/forgot-password" className="hover:underline">
               {t('auth.forgotPassword')}
             </Link>
-            <span> | </span>
+            <span className="mx-2">|</span>
             <Link to="/register" className="hover:underline">
               {t('nav.signUp')}
+            </Link>
+            <span className="mx-2">|</span>
+            <Link to="/admin/login" className="hover:underline">
+              {t('auth.adminLogin') || 'Admin Login'}
             </Link>
           </div>
         </div>
