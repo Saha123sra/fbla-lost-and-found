@@ -2,12 +2,10 @@ import React, { useState } from 'react';
 import { GoogleLogin } from '@react-oauth/google';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { useTheme } from '../context/ThemeContext';
 
 const GoogleSignInButton = ({ role = 'student', onError }) => {
   const navigate = useNavigate();
   const { loginWithGoogle } = useAuth();
-  const { isDark } = useTheme();
   const [loading, setLoading] = useState(false);
 
   const handleGoogleSuccess = async (credentialResponse) => {
@@ -17,7 +15,6 @@ const GoogleSignInButton = ({ role = 'student', onError }) => {
 
       if (result.success) {
         if (result.requiresOTP) {
-          // Admin needs OTP verification
           navigate('/verify-otp', {
             state: {
               userId: result.userId,
@@ -28,7 +25,6 @@ const GoogleSignInButton = ({ role = 'student', onError }) => {
             }
           });
         } else if (result.requiresRegistration) {
-          // New user needs to complete registration
           navigate('/complete-google-registration', {
             state: {
               googleData: result.googleData,
@@ -36,7 +32,6 @@ const GoogleSignInButton = ({ role = 'student', onError }) => {
             }
           });
         } else {
-          // Successfully logged in
           navigate(role === 'admin' ? '/admin' : '/');
         }
       } else {
@@ -74,11 +69,11 @@ const GoogleSignInButton = ({ role = 'student', onError }) => {
       <GoogleLogin
         onSuccess={handleGoogleSuccess}
         onError={handleGoogleError}
-        theme={isDark ? "filled_black" : "outline"}
+        theme="outline"
         size="large"
         text="signin_with"
         shape="rectangular"
-        width="100%"
+        width="300"
         useOneTap={false}
       />
     </div>
