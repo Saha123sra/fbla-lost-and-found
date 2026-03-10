@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { User, Mail, Lock, Hash, GraduationCap, Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
+import GoogleSignInButton from '../components/GoogleSignInButton';
 
 const StudentRegister = () => {
   const navigate = useNavigate();
@@ -22,6 +23,7 @@ const StudentRegister = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
+  const [googleError, setGoogleError] = useState('');
 
   const gradeOptions = ['Freshman', 'Sophomore', 'Junior', 'Senior'];
 
@@ -238,8 +240,31 @@ const StudentRegister = () => {
             )}
           </button>
 
+          {/* Divider */}
+          <div className="relative my-4">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-gray-300"></div>
+            </div>
+            <div className="relative flex justify-center text-sm">
+              <span className="px-2 bg-white text-gray-500">{t('auth.or', 'or')}</span>
+            </div>
+          </div>
+
+          {/* Google Error */}
+          {googleError && (
+            <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm">
+              {googleError}
+            </div>
+          )}
+
+          {/* Google Sign-Up */}
+          <GoogleSignInButton
+            role="student"
+            onError={(err) => setGoogleError(err)}
+          />
+
           {/* Links */}
-          <div className="text-center text-sm text-gray-600 space-y-2">
+          <div className="text-center text-sm text-gray-600 space-y-2 mt-4">
             <p>
               {t('auth.hasAccount')}{' '}
               <Link to="/login/student" className="text-navy-600 hover:underline font-medium">

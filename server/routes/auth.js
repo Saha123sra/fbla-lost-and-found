@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken');
 const { query } = require('../config/database');
 const { authenticate } = require('../middleware/auth');
 const { sendEmail } = require('../services/emailService');
+const { verifyGoogleToken, isAllowedEmailDomain } = require('../utils/googleAuth');
 
 const router = express.Router();
 
@@ -548,6 +549,206 @@ router.post('/reset-password', async (req, res) => {
   } catch (error) {
     console.error('Reset password error:', error);
     res.status(500).json({ error: 'Failed to reset password' });
+  }
+});
+
+// =============================================
+// GOOGLE OAUTH ROUTES
+// =============================================
+
+// Google Sign-In / Sign-Up
+router.post('/google', async (req, res) => {
+  try {
+    const { credential, role = 'student' } = req.body;
+
+    if (!credential) {
+      return res.status(400).json({ error: 'Google credential is required' });
+    }
+
+    // Verify the Google token
+    let googleUser;
+    try {
+      googleUser = await verifyGoogleToken(credential);
+    } catch (error) {
+      return res.status(401).json({ error: 'Invalid Google token' });
+    }
+
+    // Validate email domain
+    if (!isAllowedEmailDomain(googleUser.email)) {
+      return res.status(400).json({
+        error: 'Please use your school email (@forsythk12.org or @students.forsythk12.org) or a Gmail account'
+      });
+    }
+
+    // Check if user exists by Google ID or email
+    const existingUser = await query(
+      'SELECT * FROM users WHERE google_id = $1 OR email = $2',
+      [googleUser.googleId, googleUser.email]
+    );
+
+    if (existingUser.rows.length > 0) {
+      const user = existingUser.rows[0];
+
+      // Check if account is deactivated
+      if (user.status === 'deactivated') {
+        return res.status(403).json({ error: 'Account has been deactivated' });
+      }
+
+      // Check if admin account is pending
+      if (user.role === 'admin' && user.status === 'pending') {
+        return res.status(403).json({
+          error: 'Admin account pending approval',
+          status: 'pending'
+        });
+      }
+
+      // Link Google account if user exists by email but not google_id
+      if (!user.google_id) {
+        await query(
+          `UPDATE users SET google_id = $1, auth_provider =
+           CASE WHEN password_hash IS NOT NULL THEN 'both' ELSE 'google' END
+           WHERE id = $2`,
+          [googleUser.googleId, user.id]
+        );
+      }
+
+      // Admin users still require OTP verification
+      if (user.role === 'admin' || user.role === 'owner') {
+        const otp = generateOTP();
+        const otpExpiry = new Date(Date.now() + 10 * 60 * 1000);
+
+        await query(
+          'UPDATE users SET security_code = $1, code_expires_at = $2 WHERE id = $3',
+          [otp, otpExpiry, user.id]
+        );
+
+        const emailResult = await sendEmail(user.email, 'loginOTP', [user.first_name, otp]);
+
+        const response = {
+          message: 'OTP sent to your email',
+          requiresOTP: true,
+          userId: user.id,
+          email: user.email.replace(/(.{2})(.*)(@.*)/, '$1***$3')
+        };
+
+        if (emailResult.dev) {
+          response.devMode = true;
+          response.devOTP = otp;
+          response.devMessage = 'Email service not configured. Use the code shown below to login.';
+        }
+
+        return res.json(response);
+      }
+
+      // Student login - direct JWT
+      await query('UPDATE users SET last_login = NOW() WHERE id = $1', [user.id]);
+
+      const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, { expiresIn: '7d' });
+
+      return res.json({
+        message: 'Login successful',
+        user: {
+          id: user.id,
+          email: user.email,
+          role: user.role,
+          status: user.status,
+          name: `${user.first_name} ${user.last_name}`
+        },
+        token
+      });
+    }
+
+    // New user - needs to complete registration
+    return res.json({
+      requiresRegistration: true,
+      googleData: {
+        googleId: googleUser.googleId,
+        email: googleUser.email,
+        firstName: googleUser.firstName,
+        lastName: googleUser.lastName,
+        picture: googleUser.picture
+      },
+      role
+    });
+
+  } catch (error) {
+    console.error('Google auth error:', error);
+    res.status(500).json({ error: 'Google authentication failed' });
+  }
+});
+
+// Complete Google registration (new users)
+router.post('/google/complete-registration', async (req, res) => {
+  try {
+    const { googleData, studentId, gradeLevel, role = 'student' } = req.body;
+
+    if (!googleData || !googleData.googleId || !googleData.email) {
+      return res.status(400).json({ error: 'Invalid Google data' });
+    }
+
+    if (!studentId) {
+      return res.status(400).json({ error: 'Student ID is required' });
+    }
+
+    // Re-verify that no user exists with this Google ID or email
+    const existing = await query(
+      'SELECT id FROM users WHERE google_id = $1 OR email = $2 OR student_id = $3',
+      [googleData.googleId, googleData.email, studentId]
+    );
+
+    if (existing.rows.length > 0) {
+      return res.status(400).json({ error: 'An account with this email or Student ID already exists' });
+    }
+
+    // Create the user with Google auth
+    const result = await query(
+      `INSERT INTO users (
+        student_id, email, first_name, last_name, grade_level,
+        role, status, google_id, auth_provider
+      )
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 'google')
+      RETURNING id, student_id, email, role, status, first_name, last_name`,
+      [
+        studentId,
+        googleData.email,
+        googleData.firstName,
+        googleData.lastName,
+        gradeLevel || null,
+        role === 'admin' ? 'admin' : 'student',
+        role === 'admin' ? 'pending' : 'active',
+        googleData.googleId
+      ]
+    );
+
+    const user = result.rows[0];
+
+    // Admin registration - pending approval
+    if (role === 'admin') {
+      return res.status(201).json({
+        message: 'Admin registration submitted',
+        status: 'pending',
+        note: 'Your account is pending approval by the site owner. You will receive an email with your access code once approved.'
+      });
+    }
+
+    // Student registration - direct login
+    const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, { expiresIn: '7d' });
+
+    res.status(201).json({
+      message: 'Registration successful',
+      user: {
+        id: user.id,
+        email: user.email,
+        role: user.role,
+        status: user.status,
+        name: `${user.first_name} ${user.last_name}`
+      },
+      token
+    });
+
+  } catch (error) {
+    console.error('Google complete registration error:', error);
+    res.status(500).json({ error: 'Registration failed' });
   }
 });
 

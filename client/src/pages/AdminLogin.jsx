@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, Crown, Shield } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
-// Force rebuild: v2.0 - OTP-based admin authentication
+import GoogleSignInButton from '../components/GoogleSignInButton';
 
 const AdminLogin = () => {
   const { t } = useLanguage();
@@ -164,6 +164,25 @@ const AdminLogin = () => {
               {loading ? t('common.loading') : t('auth.login')}
             </button>
           </form>
+
+          {/* Google Sign-In for Admin only */}
+          {loginType === 'admin' && (
+            <>
+              <div className="relative my-6">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-gray-300"></div>
+                </div>
+                <div className="relative flex justify-center text-sm">
+                  <span className="px-2 bg-white text-gray-500">{t('auth.or', 'or')}</span>
+                </div>
+              </div>
+
+              <GoogleSignInButton
+                role="admin"
+                onError={(err) => setError(err)}
+              />
+            </>
+          )}
 
           <div className="mt-6 text-center text-sm text-gray-600">
             <Link to="/forgot-password" className="hover:underline">

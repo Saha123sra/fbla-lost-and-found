@@ -29,6 +29,7 @@ import VerifyOTP from './pages/VerifyOTP';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
 import EditItem from './pages/EditItem';
+import CompleteGoogleRegistration from './pages/CompleteGoogleRegistration';
 
 // Protected route wrapper
 const ProtectedRoute = ({ children, adminOnly = false, ownerOnly = false }) => {
@@ -92,6 +93,7 @@ const App = () => {
           <Route path="/verify-otp" element={<VerifyOTP />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password/:token" element={<ResetPassword />} />
+          <Route path="/complete-google-registration" element={<CompleteGoogleRegistration />} />
 
           {/* Protected routes */}
           <Route

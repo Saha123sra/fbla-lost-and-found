@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { Search, Upload, CheckCircle, ArrowRight, Package } from 'lucide-react';
 import { itemsAPI, testimonialsAPI } from '../services/api';
 import { useLanguage } from '../context/LanguageContext';
-import heroVideo from '../assets/Lost Dane Found Home page video.mp4';
+import heroVideo from '../assets/Lost Dane Found Home page video (3).mp4';
 
 // Animated Counter Component
 const AnimatedCounter = ({ value, suffix = '', duration = 1500 }) => {

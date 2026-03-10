@@ -368,6 +368,21 @@ VALUES (
 ) ON CONFLICT (student_id) DO NOTHING;
 
 -- =============================================
+-- GOOGLE OAUTH SUPPORT
+-- =============================================
+-- Add Google OAuth columns to users table
+ALTER TABLE users
+ADD COLUMN IF NOT EXISTS google_id VARCHAR(255) UNIQUE,
+ADD COLUMN IF NOT EXISTS auth_provider VARCHAR(20) DEFAULT 'local'
+    CHECK (auth_provider IN ('local', 'google', 'both'));
+
+-- Allow password_hash to be NULL (for Google-only users)
+ALTER TABLE users ALTER COLUMN password_hash DROP NOT NULL;
+
+-- Index for faster Google ID lookups
+CREATE INDEX IF NOT EXISTS idx_users_google_id ON users(google_id);
+
+-- =============================================
 -- DONE! Your database is ready.
 -- =============================================
-SELECT 'Database setup complete! 🎉' AS message;
+SELECT 'Database setup complete!' AS message;

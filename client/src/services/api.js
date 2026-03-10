@@ -47,7 +47,10 @@ export const authAPI = {
   changePassword: (data) => api.post('/auth/change-password', data),
   forgotPassword: (email) => api.post('/auth/forgot-password', { email }),
   verifyResetToken: (token) => api.get(`/auth/verify-reset-token/${token}`),
-  resetPassword: (token, password) => api.post('/auth/reset-password', { token, password })
+  resetPassword: (token, password) => api.post('/auth/reset-password', { token, password }),
+  // Google OAuth
+  googleLogin: (credential, role) => api.post('/auth/google', { credential, role }),
+  googleCompleteRegistration: (data) => api.post('/auth/google/complete-registration', data)
 };
 
 // ============ ITEMS ============

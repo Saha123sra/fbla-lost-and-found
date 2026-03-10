@@ -172,6 +172,80 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  // Google Sign-In
+  const loginWithGoogle = async (credential, role = 'student') => {
+    try {
+      const response = await authAPI.googleLogin(credential, role);
+
+      // Check if OTP is required (admin/owner)
+      if (response.data.requiresOTP) {
+        return {
+          success: true,
+          requiresOTP: true,
+          userId: response.data.userId,
+          email: response.data.email,
+          devMode: response.data.devMode,
+          devOTP: response.data.devOTP
+        };
+      }
+
+      // Check if registration is required (new user)
+      if (response.data.requiresRegistration) {
+        return {
+          success: true,
+          requiresRegistration: true,
+          googleData: response.data.googleData,
+          role: response.data.role
+        };
+      }
+
+      // Direct login (existing student)
+      const { user: userData, token } = response.data;
+      localStorage.setItem('token', token);
+      localStorage.setItem('user', JSON.stringify(userData));
+      setUser(userData);
+      setIsAuthenticated(true);
+      toast.success(`Welcome back, ${userData.name}!`);
+      return { success: true, user: userData };
+
+    } catch (error) {
+      // Check for pending admin
+      if (error.response?.data?.status === 'pending') {
+        return { success: false, error: 'Admin account pending approval', status: 'pending' };
+      }
+      const message = error.response?.data?.error || 'Google sign-in failed';
+      toast.error(message);
+      return { success: false, error: message };
+    }
+  };
+
+  // Complete Google registration for new users
+  const completeGoogleRegistration = async (data) => {
+    try {
+      const response = await authAPI.googleCompleteRegistration(data);
+
+      // Check if admin registration (pending)
+      if (response.data.status === 'pending') {
+        toast.success('Admin registration submitted! Awaiting approval.');
+        return { success: true, status: 'pending', note: response.data.note };
+      }
+
+      // Student registration - direct login
+      const { user: userData, token } = response.data;
+      localStorage.setItem('token', token);
+      localStorage.setItem('user', JSON.stringify(userData));
+      setUser(userData);
+      setIsAuthenticated(true);
+      toast.success('Account created successfully!');
+      return { success: true, user: userData };
+
+    } catch (error) {
+      const message = error.response?.data?.error || 'Registration failed';
+      toast.error(message);
+      return { success: false, error: message };
+    }
+  };
+
   const value = {
     user,
     loading,
@@ -184,6 +258,8 @@ export const AuthProvider = ({ children }) => {
     login,
     completeLogin,
     loginOwner,
+    loginWithGoogle,
+    completeGoogleRegistration,
     logout,
     updateProfile
   };
