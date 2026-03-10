@@ -2,10 +2,12 @@ import React, { useState } from 'react';
 import { GoogleLogin } from '@react-oauth/google';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
 
 const GoogleSignInButton = ({ role = 'student', onError }) => {
   const navigate = useNavigate();
   const { loginWithGoogle } = useAuth();
+  const { isDark } = useTheme();
   const [loading, setLoading] = useState(false);
 
   const handleGoogleSuccess = async (credentialResponse) => {
@@ -72,7 +74,7 @@ const GoogleSignInButton = ({ role = 'student', onError }) => {
       <GoogleLogin
         onSuccess={handleGoogleSuccess}
         onError={handleGoogleError}
-        theme="outline"
+        theme={isDark ? "filled_black" : "outline"}
         size="large"
         text="signin_with"
         shape="rectangular"
