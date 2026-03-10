@@ -132,7 +132,7 @@ const templates = {
           <p style="color: #4b5563; margin-bottom: 20px;">If this looks like your item, click below to view it and submit a claim.</p>
 
           <div style="text-align: center;">
-            <a href="${FRONTEND_URL}/item/${itemId}" style="display: inline-block; background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%); color: white; padding: 14px 32px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px;">
+            <a href="${FRONTEND_URL}/items/${itemId}" style="display: inline-block; background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%); color: white; padding: 14px 32px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px;">
               View Item & Claim
             </a>
           </div>
